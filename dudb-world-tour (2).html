@@ -1,0 +1,1782 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>DUDB World Tour 2026</title><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0;}body{background:#f9fafb;}</style></head><body><div id="root"></div><script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script><script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script><script>const { useState, useMemo } = React;
+const TIERS = {
+  MAJOR: { label: "MAJOR", points: 2e3, draws: 32 },
+  "1000": { label: "1000", points: 1e3, draws: 24 },
+  "500": { label: "500", points: 500, draws: 16 },
+  Finals: { label: "Finals", points: 1500, draws: 8 }
+};
+const TOURNAMENTS = [
+  { id: 1, name: "Kiwi Cup", tier: "500", location: "Auckland, NZL", start: "Apr 13", end: "Apr 17, 2026", status: "completed" },
+  { id: 2, name: "Australian Super Smackdown (ASS) Open", tier: "MAJOR", location: "Melbourne, AUS", start: "Apr 20", end: "May 1, 2026", status: "completed" },
+  { id: 3, name: "Dunes Invitational", tier: "500", location: "Dubai, UAE", start: "May 4", end: "May 8, 2026", status: "completed" },
+  { id: 4, name: "Kabul Open", tier: "500", location: "Kabul, AFG", start: "May 11", end: "May 15, 2026", status: "completed" },
+  { id: 5, name: "Seoul Masters", tier: "1000", location: "Seoul, KOR", start: "May 18", end: "May 22, 2026", status: "completed" },
+  { id: 6, name: "Dragon's Cup", tier: "500", location: "Beijing, CHN", start: "May 25", end: "May 29, 2026", status: "completed" },
+  { id: 7, name: "Tea Invitational Throwdown (TIT) Open", tier: "MAJOR", location: "Tokyo, JPN", start: "Jun 1", end: "Jun 12, 2026", status: "completed" },
+  { id: 8, name: "Royal London Cup", tier: "1000", location: "London, GBR", start: "Jun 15", end: "Jun 19, 2026", status: "completed" },
+  { id: 9, name: "Paris Grand Prix", tier: "500", location: "Paris, FRA", start: "Jun 22", end: "Jun 26, 2026", status: "upcoming" },
+  { id: 10, name: "Berlin Masters", tier: "1000", location: "Berlin, GER", start: "Jun 29", end: "Jul 3, 2026", status: "upcoming" },
+  { id: 11, name: "Arctic Open", tier: "500", location: "Reykjav\xEDk, ISL", start: "Jul 6", end: "Jul 10, 2026", status: "upcoming" },
+  { id: 12, name: "The Championships, Ultimate Mayhem (CUM)", tier: "MAJOR", location: "Athens, GRE", start: "Jul 13", end: "Jul 24, 2026", status: "upcoming" },
+  { id: 13, name: "Southern Summit Open", tier: "500", location: "Cape Town, RSA", start: "Jul 27", end: "Jul 31, 2026", status: "upcoming" },
+  { id: 14, name: "Nile Crown", tier: "1000", location: "Cairo, EGY", start: "Aug 3", end: "Aug 7, 2026", status: "upcoming" },
+  { id: 15, name: "Cascadia Cup", tier: "500", location: "Iguazu Falls, ARG", start: "Aug 10", end: "Aug 21, 2026", status: "upcoming" },
+  { id: 16, name: "Amazon Battlegrounds", tier: "1000", location: "S\xE3o Paulo, BRA", start: "Aug 24", end: "Aug 28, 2026", status: "upcoming" },
+  { id: 17, name: "Pacific Sun Open", tier: "1000", location: "Acapulco, MEX", start: "Aug 31", end: "Sep 11, 2026", status: "upcoming" },
+  { id: 18, name: "Spanktown United States (SUS) Open", tier: "MAJOR", location: "New York, USA", start: "Sep 14", end: "Sep 25, 2026", status: "upcoming" },
+  { id: 19, name: "Iron Horse Cup", tier: "500", location: "San Ramon, USA", start: "Sep 28", end: "Oct 2, 2026", status: "upcoming" },
+  { id: 20, name: "Apex Invitational", tier: "Finals", location: "Low-Earth Orbit", start: "Nov 9", end: "Nov 13, 2026", status: "upcoming" }
+];
+const RANKINGS_SNAPSHOTS = [
+  {
+    id: "week10",
+    label: "Week 10 (Post London)",
+    players: [
+      { rank: 1, name: "Jessica", nat: "USA", points: 10200, shift: 0, wl: [19, 6], played: 8 },
+      { rank: 2, name: "Jacob", nat: "USA", points: 6280, shift: 0, wl: [13, 6], played: 8 },
+      { rank: 3, name: "Raymond", nat: "USA", points: 5630, shift: 2, wl: [9, 8], played: 8 },
+      { rank: 4, name: "Ellison", nat: "USA", points: 5450, shift: -1, wl: [12, 7], played: 8 },
+      { rank: 5, name: "Athena", nat: "USA", points: 5150, shift: -1, wl: [6, 8], played: 8 },
+      { rank: 6, name: "Nate", nat: "USA", points: 3860, shift: 1, wl: [7, 8], played: 8 },
+      { rank: 7, name: "Andrew", nat: "KAZ", points: 3700, shift: -1, wl: [7, 8], played: 8 },
+      { rank: 8, name: "Carlos", nat: "USA", points: 3600, shift: 0, wl: [4, 8], played: 8 },
+      { rank: 9, name: "Mario", nat: "ITA", points: 2850, shift: 0, wl: [10, 3], played: 5 },
+      { rank: 10, name: "Feraligatr", nat: "PKM", points: 1550, shift: 0, wl: [7, 5], played: 5 },
+      { rank: 11, name: "Titus", nat: "CAN", points: 1500, shift: 2, wl: [6, 5], played: 5 },
+      { rank: 12, name: "Minecraft Villager", nat: "MCF", points: 1400, shift: 0, wl: [7, 4], played: 4 },
+      { rank: 13, name: "Zohran Mamdani", nat: "USA", points: 1380, shift: -2, wl: [6, 5], played: 5 },
+      { rank: 14, name: "Jeon JUNG-KOOK", nat: "KOR", points: 1150, shift: 1, wl: [5, 5], played: 5 },
+      { rank: 15, name: "Jonathan Bailey", nat: "GBR", points: 1100, shift: -1, wl: [6, 3], played: 4 },
+      { rank: 16, name: "Dean Withers", nat: "AUS", points: 1e3, shift: 0, wl: [4, 5], played: 5 },
+      { rank: 17, name: "Tate McRae", nat: "CAN", points: 900, shift: 0, wl: [3, 5], played: 5 },
+      { rank: 18, name: "Luigi", nat: "ITA", points: 850, shift: 2, wl: [3, 5], played: 5 },
+      { rank: 19, name: "Roronoa Zoro", nat: "JPN", points: 830, shift: -1, wl: [4, 5], played: 5 },
+      { rank: 20, name: "Herobrine", nat: "MCF", points: 800, shift: -1, wl: [3, 5], played: 5 },
+      { rank: 21, name: "Hatsune Miku", nat: "JPN", points: 800, shift: 0, wl: [3, 5], played: 5 },
+      { rank: 22, name: "Ashley Guillard", nat: "USA", points: 750, shift: 3, wl: [5, 4], played: 4 },
+      { rank: 23, name: "Dick Pump", nat: "USA", points: 730, shift: -1, wl: [4, 5], played: 5 },
+      { rank: 24, name: "Don Cheadle", nat: "USA", points: 700, shift: -1, wl: [4, 4], played: 4 },
+      { rank: 25, name: "Satoru Gojo", nat: "JPN", points: 600, shift: -1, wl: [1, 5], played: 5 },
+      { rank: 26, name: "Xitong Wei", nat: "CHN", points: 600, shift: 0, wl: [2, 5], played: 5 },
+      { rank: 27, name: "Batman", nat: "USA", points: 550, shift: 0, wl: [3, 5], played: 5 },
+      { rank: 28, name: "Denji", nat: "JPN", points: 500, shift: 0, wl: [1, 5], played: 5 },
+      { rank: 29, name: "Katniss Everdeen", nat: "PAN", points: 500, shift: 0, wl: [1, 4], played: 4 },
+      { rank: 30, name: "Jigglypuff", nat: "PKM", points: 500, shift: 1, wl: [2, 4], played: 4 },
+      { rank: 31, name: "Darth Vader", nat: "EMP", points: 450, shift: 1, wl: [1, 4], played: 4 },
+      { rank: 32, name: "JonBen\xE9t Ramsey", nat: "USA", points: 400, shift: -2 },
+      { rank: 33, name: "Sonic the Hedgehog", nat: "MOB", points: 300, shift: 0, wl: [0, 4], played: 4 },
+      { rank: 34, name: "Abraham Lincoln", nat: "USA", points: 200, shift: 0 },
+      { rank: 35, name: "Benson Boone", nat: "USA", points: 200, shift: 0 },
+      { rank: 36, name: "Doomfist", nat: "NGR", points: 200, shift: 0 },
+      { rank: 37, name: "Ludwig Ahgren", nat: "USA", points: 200, shift: 0 },
+      { rank: 38, name: "Taylor Swift", nat: "USA", points: 200, shift: 0 },
+      { rank: 39, name: "Barack Obama", nat: "USA", points: 100, shift: 0 },
+      { rank: 40, name: "Deborah Sater", nat: "RUS", points: 100, shift: 0 },
+      { rank: 41, name: "Kento Nanami", nat: "JPN", points: 100, shift: 0 },
+      { rank: 42, name: "Jacob Elordi", nat: "AUS", points: 50, shift: 0 },
+      { rank: 43, name: "Peter Griffin", nat: "USA", points: 50, shift: 0 }
+    ]
+  },
+  {
+    id: "week9",
+    label: "Week 9 (Post Tokyo)",
+    players: [
+      { rank: 1, name: "Jessica", nat: "USA", points: 9400, shift: 0, wl: [15, 6], played: 7 },
+      { rank: 2, name: "Jacob", nat: "USA", points: 6830, shift: 0, wl: [13, 5], played: 7 },
+      { rank: 3, name: "Ellison", nat: "USA", points: 5550, shift: 2, wl: [12, 6], played: 7 },
+      { rank: 4, name: "Athena", nat: "USA", points: 5450, shift: -1, wl: [6, 7], played: 7 },
+      { rank: 5, name: "Raymond", nat: "USA", points: 5430, shift: 1, wl: [7, 7], played: 7 },
+      { rank: 6, name: "Andrew", nat: "KAZ", points: 4500, shift: 1, wl: [6, 7], played: 7 },
+      { rank: 7, name: "Nate", nat: "USA", points: 4160, shift: -3, wl: [7, 7], played: 7 },
+      { rank: 8, name: "Carlos", nat: "USA", points: 3150, shift: 0, wl: [1, 7], played: 7 },
+      { rank: 9, name: "Mario", nat: "ITA", points: 2850, shift: 2, wl: [10, 3], played: 5 },
+      { rank: 10, name: "Feraligatr", nat: "PKM", points: 1550, shift: 3, wl: [7, 5], played: 5 },
+      { rank: 11, name: "Zohran Mamdani", nat: "USA", points: 1330, shift: 9, wl: [6, 4], played: 4 },
+      { rank: 12, name: "Minecraft Villager", nat: "MCF", points: 1200, shift: -3, wl: [5, 3], played: 3 },
+      { rank: 13, name: "Titus", nat: "CAN", points: 1100, shift: -3, wl: [3, 4], played: 4 },
+      { rank: 14, name: "Jonathan Bailey", nat: "GBR", points: 1050, shift: 1, wl: [6, 2], played: 3 },
+      { rank: 15, name: "Jeon JUNG-KOOK", nat: "KOR", points: 950, shift: -3, wl: [3, 4], played: 4 },
+      { rank: 16, name: "Dean Withers", nat: "AUS", points: 950, shift: 3, wl: [4, 4], played: 4 },
+      { rank: 17, name: "Tate McRae", nat: "CAN", points: 900, shift: 6, wl: [3, 5], played: 5 },
+      { rank: 18, name: "Roronoa Zoro", nat: "JPN", points: 830, shift: -4, wl: [4, 5], played: 5 },
+      { rank: 19, name: "Herobrine", nat: "MCF", points: 800, shift: 9, wl: [3, 5], played: 5 },
+      { rank: 20, name: "Luigi", nat: "ITA", points: 750, shift: -4, wl: [2, 4], played: 4 },
+      { rank: 21, name: "Hatsune Miku", nat: "JPN", points: 750, shift: -3, wl: [3, 4], played: 4 },
+      { rank: 22, name: "Dick Pump", nat: "USA", points: 730, shift: -5, wl: [4, 5], played: 5 },
+      { rank: 23, name: "Don Cheadle", nat: "USA", points: 600, shift: -2, wl: [3, 3], played: 3 },
+      { rank: 24, name: "Satoru Gojo", nat: "JPN", points: 600, shift: -2, wl: [1, 5], played: 5 },
+      { rank: 25, name: "Ashley Guillard", nat: "USA", points: 550, shift: -1, wl: [3, 3], played: 3 },
+      { rank: 26, name: "Xitong Wei", nat: "CHN", points: 550, shift: -1, wl: [2, 4], played: 4 },
+      { rank: 27, name: "Batman", nat: "USA", points: 550, shift: -1, wl: [3, 5], played: 5 },
+      { rank: 28, name: "Denji", nat: "JPN", points: 450, shift: 1, wl: [1, 4], played: 4 },
+      { rank: 29, name: "Katniss Everdeen", nat: "PAN", points: 450, shift: 3, wl: [1, 3], played: 3 },
+      { rank: 30, name: "JonBen\xE9t Ramsey", nat: "USA", points: 400, shift: -3 },
+      { rank: 31, name: "Jigglypuff", nat: "PKM", points: 400, shift: -1, wl: [1, 3], played: 3 },
+      { rank: 32, name: "Darth Vader", nat: "EMP", points: 350, shift: -1, wl: [0, 3], played: 3 },
+      { rank: 33, name: "Sonic the Hedgehog", nat: "MOB", points: 250, shift: 5, wl: [0, 3], played: 3 },
+      { rank: 34, name: "Abraham Lincoln", nat: "USA", points: 200, shift: -1 },
+      { rank: 35, name: "Benson Boone", nat: "USA", points: 200, shift: -1 },
+      { rank: 36, name: "Doomfist", nat: "NGR", points: 200, shift: -1 },
+      { rank: 37, name: "Ludwig Ahgren", nat: "USA", points: 200, shift: -1 },
+      { rank: 38, name: "Taylor Swift", nat: "USA", points: 200, shift: -1 },
+      { rank: 39, name: "Barack Obama", nat: "USA", points: 100, shift: 0 },
+      { rank: 40, name: "Deborah Sater", nat: "RUS", points: 100, shift: 0 },
+      { rank: 41, name: "Kento Nanami", nat: "JPN", points: 100, shift: 0 },
+      { rank: 42, name: "Jacob Elordi", nat: "AUS", points: 50, shift: 0 },
+      { rank: 43, name: "Peter Griffin", nat: "USA", points: 50, shift: 0 }
+    ]
+  },
+  {
+    id: "week7",
+    label: "Week 7 (Post Beijing)",
+    players: [
+      { rank: 1, name: "Jessica", nat: "USA", points: 9800, shift: 0, wl: [14, 5], played: 6 },
+      { rank: 2, name: "Jacob", nat: "USA", points: 7030, shift: 0, wl: [12, 4], played: 6 },
+      { rank: 3, name: "Athena", nat: "USA", points: 6650, shift: 0, wl: [6, 6], played: 6 },
+      { rank: 4, name: "Nate", nat: "USA", points: 6060, shift: 0, wl: [7, 6], played: 6 },
+      { rank: 5, name: "Ellison", nat: "USA", points: 5950, shift: 0, wl: [11, 5], played: 6 },
+      { rank: 6, name: "Raymond", nat: "USA", points: 4930, shift: 0, wl: [3, 6], played: 6 },
+      { rank: 7, name: "Andrew", nat: "KAZ", points: 4700, shift: 0, wl: [5, 6], played: 6 },
+      { rank: 8, name: "Carlos", nat: "USA", points: 3850, shift: 0, wl: [1, 6], played: 6 },
+      { rank: 9, name: "Minecraft Villager", nat: "MCF", points: 1e3, shift: 0, wl: [4, 2], played: 2 },
+      { rank: 10, name: "Titus", nat: "CAN", points: 1e3, shift: 0, wl: [3, 3], played: 3 },
+      { rank: 11, name: "Mario", nat: "ITA", points: 850, shift: 0, wl: [5, 3], played: 4 },
+      { rank: 12, name: "Jeon JUNG-KOOK", nat: "KOR", points: 750, shift: 0, wl: [2, 3], played: 3 },
+      { rank: 13, name: "Feraligatr", nat: "PKM", points: 750, shift: 0, wl: [4, 4], played: 4 },
+      { rank: 14, name: "Roronoa Zoro", nat: "JPN", points: 730, shift: 0, wl: [4, 4], played: 4 },
+      { rank: 15, name: "Jonathan Bailey", nat: "GBR", points: 650, shift: 0, wl: [4, 1], played: 2 },
+      { rank: 16, name: "Luigi", nat: "ITA", points: 650, shift: 0, wl: [2, 3], played: 3 },
+      { rank: 17, name: "Dick Pump", nat: "USA", points: 630, shift: 13, wl: [4, 4], played: 4 },
+      { rank: 18, name: "Hatsune Miku", nat: "JPN", points: 550, shift: -1, wl: [2, 3], played: 3 },
+      { rank: 19, name: "Dean Withers", nat: "AUS", points: 550, shift: -1, wl: [2, 3], played: 3 },
+      { rank: 20, name: "Zohran Mamdani", nat: "USA", points: 530, shift: -1, wl: [3, 3], played: 3 },
+      { rank: 21, name: "Don Cheadle", nat: "USA", points: 500, shift: -1, wl: [3, 2], played: 2 },
+      { rank: 22, name: "Satoru Gojo", nat: "JPN", points: 500, shift: 0, wl: [1, 4], played: 4 },
+      { rank: 23, name: "Tate McRae", nat: "CAN", points: 500, shift: 2, wl: [1, 4], played: 4 },
+      { rank: 24, name: "Ashley Guillard", nat: "USA", points: 450, shift: -3, wl: [3, 2], played: 2 },
+      { rank: 25, name: "Xitong Wei", nat: "CHN", points: 450, shift: -2, wl: [2, 3], played: 3 },
+      { rank: 26, name: "Batman", nat: "USA", points: 450, shift: 0, wl: [3, 4], played: 4 },
+      { rank: 27, name: "JonBen\xE9t Ramsey", nat: "USA", points: 400, shift: -3 },
+      { rank: 28, name: "Herobrine", nat: "MCF", points: 400, shift: 0, wl: [1, 4], played: 4 },
+      { rank: 29, name: "Denji", nat: "JPN", points: 350, shift: -2, wl: [1, 3], played: 3 },
+      { rank: 30, name: "Jigglypuff", nat: "PKM", points: 300, shift: -1, wl: [1, 2], played: 2 },
+      { rank: 31, name: "Darth Vader", nat: "EMP", points: 250, shift: 0, wl: [0, 2], played: 2 },
+      { rank: 32, name: "Katniss Everdeen", nat: "PAN", points: 250, shift: 0, wl: [0, 2], played: 2 },
+      { rank: 33, name: "Abraham Lincoln", nat: "USA", points: 200, shift: 0 },
+      { rank: 34, name: "Benson Boone", nat: "USA", points: 200, shift: 0 },
+      { rank: 35, name: "Doomfist", nat: "NGR", points: 200, shift: 0 },
+      { rank: 36, name: "Ludwig Ahgren", nat: "USA", points: 200, shift: 0 },
+      { rank: 37, name: "Taylor Swift", nat: "USA", points: 200, shift: 0 },
+      { rank: 38, name: "Sonic the Hedgehog", nat: "MOB", points: 150, shift: 0, wl: [0, 2], played: 2 },
+      { rank: 39, name: "Barack Obama", nat: "USA", points: 100, shift: 0 },
+      { rank: 40, name: "Deborah Sater", nat: "RUS", points: 100, shift: 0 },
+      { rank: 41, name: "Kento Nanami", nat: "JPN", points: 100, shift: 0 },
+      { rank: 42, name: "Jacob Elordi", nat: "AUS", points: 50, shift: 0 },
+      { rank: 43, name: "Peter Griffin", nat: "USA", points: 50, shift: 0 }
+    ]
+  },
+  {
+    id: "week6",
+    label: "Week 6 (Post Seoul)",
+    players: [
+      { rank: 1, name: "Jessica", nat: "USA", points: 9800, shift: 0, wl: [12, 4], played: 5 },
+      { rank: 2, name: "Jacob", nat: "USA", points: 7080, shift: 2, wl: [12, 3], played: 5 },
+      { rank: 3, name: "Athena", nat: "USA", points: 6880, shift: 0, wl: [5, 5], played: 5 },
+      { rank: 4, name: "Nate", nat: "USA", points: 6510, shift: -2, wl: [7, 5], played: 5 },
+      { rank: 5, name: "Ellison", nat: "USA", points: 5550, shift: 0, wl: [7, 5], played: 5 },
+      { rank: 6, name: "Raymond", nat: "USA", points: 4830, shift: 0, wl: [1, 5], played: 5 },
+      { rank: 7, name: "Andrew", nat: "KAZ", points: 4700, shift: 0, wl: [4, 5], played: 5 },
+      { rank: 8, name: "Carlos", nat: "USA", points: 4e3, shift: 0, wl: [1, 5], played: 5 },
+      { rank: 9, name: "Minecraft Villager", nat: "MCF", points: 1e3, shift: 0, wl: [4, 2], played: 2 },
+      { rank: 10, name: "Titus", nat: "CAN", points: 1e3, shift: 0, wl: [3, 3], played: 3 },
+      { rank: 11, name: "Mario", nat: "ITA", points: 750, shift: 0, wl: [4, 2], played: 3 },
+      { rank: 12, name: "Jeon JUNG-KOOK", nat: "KOR", points: 750, shift: 0, wl: [2, 3], played: 3 },
+      { rank: 13, name: "Feraligatr", nat: "PKM", points: 700, shift: 2, wl: [4, 3], played: 3 },
+      { rank: 14, name: "Roronoa Zoro", nat: "JPN", points: 680, shift: 0, wl: [4, 3], played: 3 },
+      { rank: 15, name: "Jonathan Bailey", nat: "GBR", points: 650, shift: -2, wl: [4, 1], played: 2 },
+      { rank: 16, name: "Luigi", nat: "ITA", points: 650, shift: 13, wl: [2, 3], played: 3 },
+      { rank: 17, name: "Hatsune Miku", nat: "JPN", points: 550, shift: -1, wl: [2, 3], played: 3 },
+      { rank: 18, name: "Dean Withers", nat: "AUS", points: 550, shift: 19, wl: [2, 3], played: 3 },
+      { rank: 19, name: "Zohran Mamdani", nat: "USA", points: 530, shift: -1, wl: [3, 3], played: 3 },
+      { rank: 20, name: "Don Cheadle", nat: "USA", points: 500, shift: -3, wl: [3, 2], played: 2 },
+      { rank: 21, name: "Ashley Guillard", nat: "USA", points: 450, shift: -2, wl: [3, 2], played: 2 },
+      { rank: 22, name: "Satoru Gojo", nat: "JPN", points: 450, shift: -1, wl: [1, 3], played: 3 },
+      { rank: 23, name: "Xitong Wei", nat: "CHN", points: 450, shift: 0, wl: [2, 3], played: 3 },
+      { rank: 24, name: "JonBen\xE9t Ramsey", nat: "USA", points: 400, shift: -4 },
+      { rank: 25, name: "Tate McRae", nat: "CAN", points: 400, shift: -3, wl: [0, 3], played: 3 },
+      { rank: 26, name: "Batman", nat: "USA", points: 400, shift: -2, wl: [3, 3], played: 3 },
+      { rank: 27, name: "Denji", nat: "JPN", points: 350, shift: -2, wl: [1, 3], played: 3 },
+      { rank: 28, name: "Herobrine", nat: "MCF", points: 350, shift: -1, wl: [1, 3], played: 3 },
+      { rank: 29, name: "Jigglypuff", nat: "PKM", points: 300, shift: -3, wl: [1, 2], played: 2 },
+      { rank: 30, name: "Dick Pump", nat: "USA", points: 300, shift: -2, wl: [1, 3], played: 3 },
+      { rank: 31, name: "Darth Vader", nat: "EMP", points: 250, shift: -1, wl: [0, 2], played: 2 },
+      { rank: 32, name: "Katniss Everdeen", nat: "PAN", points: 250, shift: -1, wl: [0, 2], played: 2 },
+      { rank: 33, name: "Abraham Lincoln", nat: "USA", points: 200, shift: -1 },
+      { rank: 34, name: "Benson Boone", nat: "USA", points: 200, shift: -1 },
+      { rank: 35, name: "Doomfist", nat: "NGR", points: 200, shift: -1 },
+      { rank: 36, name: "Ludwig Ahgren", nat: "USA", points: 200, shift: -1 },
+      { rank: 37, name: "Taylor Swift", nat: "USA", points: 200, shift: -1 },
+      { rank: 38, name: "Sonic the Hedgehog", nat: "MOB", points: 150, shift: 0, wl: [0, 2], played: 2 },
+      { rank: 39, name: "Barack Obama", nat: "USA", points: 100, shift: 0 },
+      { rank: 40, name: "Deborah Sater", nat: "RUS", points: 100, shift: 0 },
+      { rank: 41, name: "Kento Nanami", nat: "JPN", points: 100, shift: 0 },
+      { rank: 42, name: "Jacob Elordi", nat: "AUS", points: 50, shift: 0 },
+      { rank: 43, name: "Peter Griffin", nat: "USA", points: 50, shift: 0 }
+    ]
+  },
+  {
+    id: "week5",
+    label: "Week 5 (Post Kabul)",
+    players: [
+      { rank: 1, name: "Jessica", nat: "USA", points: 10250, shift: 0, wl: [10, 3], played: 4 },
+      { rank: 2, name: "Nate", nat: "USA", points: 7310, shift: 1, wl: [5, 4], played: 4 },
+      { rank: 3, name: "Athena", nat: "USA", points: 7080, shift: -1, wl: [4, 4], played: 4 },
+      { rank: 4, name: "Jacob", nat: "USA", points: 6280, shift: 0, wl: [8, 3], played: 4 },
+      { rank: 5, name: "Ellison", nat: "USA", points: 5300, shift: 0, wl: [4, 4], played: 4 },
+      { rank: 6, name: "Raymond", nat: "USA", points: 4930, shift: 0, wl: [1, 4], played: 4 },
+      { rank: 7, name: "Andrew", nat: "KAZ", points: 4700, shift: 0, wl: [3, 4], played: 4 },
+      { rank: 8, name: "Carlos", nat: "USA", points: 4100, shift: 0, wl: [1, 4], played: 4 },
+      { rank: 9, name: "Minecraft Villager", nat: "MCF", points: 1e3, shift: 1, wl: [4, 2], played: 2 },
+      { rank: 10, name: "Titus", nat: "CAN", points: 950, shift: -1, wl: [3, 2], played: 2 },
+      { rank: 11, name: "Mario", nat: "ITA", points: 700, shift: 0, wl: [4, 1], played: 2 },
+      { rank: 12, name: "Jeon JUNG-KOOK", nat: "KOR", points: 650, shift: 0, wl: [1, 2], played: 2 },
+      { rank: 13, name: "Jonathan Bailey", nat: "GBR", points: 650, shift: 23, wl: [4, 1], played: 2 },
+      { rank: 14, name: "Roronoa Zoro", nat: "JPN", points: 630, shift: -1, wl: [4, 2], played: 2 },
+      { rank: 15, name: "Feraligatr", nat: "PKM", points: 600, shift: -1, wl: [3, 2], played: 2 },
+      { rank: 16, name: "Hatsune Miku", nat: "JPN", points: 500, shift: -1, wl: [2, 2], played: 2 },
+      { rank: 17, name: "Don Cheadle", nat: "USA", points: 500, shift: 1, wl: [3, 2], played: 2 },
+      { rank: 18, name: "Zohran Mamdani", nat: "USA", points: 480, shift: -2, wl: [3, 2], played: 2 },
+      { rank: 19, name: "Ashley Guillard", nat: "USA", points: 450, shift: 0, wl: [3, 2], played: 2 },
+      { rank: 20, name: "JonBen\xE9t Ramsey", nat: "USA", points: 400, shift: -3 },
+      { rank: 21, name: "Satoru Gojo", nat: "JPN", points: 350, shift: -1, wl: [0, 2], played: 2 },
+      { rank: 22, name: "Tate McRae", nat: "CAN", points: 350, shift: -1, wl: [0, 2], played: 2 },
+      { rank: 23, name: "Xitong Wei", nat: "CHN", points: 350, shift: -1, wl: [1, 2], played: 2 },
+      { rank: 24, name: "Batman", nat: "USA", points: 300, shift: -1, wl: [2, 2], played: 2 },
+      { rank: 25, name: "Denji", nat: "JPN", points: 300, shift: -1, wl: [1, 2], played: 2 },
+      { rank: 26, name: "Jigglypuff", nat: "PKM", points: 300, shift: 5, wl: [1, 2], played: 2 },
+      { rank: 27, name: "Herobrine", nat: "MCF", points: 250, shift: -2, wl: [0, 2], played: 2 },
+      { rank: 28, name: "Dick Pump", nat: "USA", points: 250, shift: -2, wl: [1, 2], played: 2 },
+      { rank: 29, name: "Luigi", nat: "ITA", points: 250, shift: -2, wl: [0, 2], played: 2 },
+      { rank: 30, name: "Darth Vader", nat: "EMP", points: 250, shift: 4, wl: [0, 2], played: 2 },
+      { rank: 31, name: "Katniss Everdeen", nat: "PAN", points: 250, shift: 4, wl: [0, 2], played: 2 },
+      { rank: 32, name: "Abraham Lincoln", nat: "USA", points: 200, shift: -4 },
+      { rank: 33, name: "Benson Boone", nat: "USA", points: 200, shift: -4 },
+      { rank: 34, name: "Doomfist", nat: "NGR", points: 200, shift: -4 },
+      { rank: 35, name: "Ludwig Ahgren", nat: "USA", points: 200, shift: -3 },
+      { rank: 36, name: "Taylor Swift", nat: "USA", points: 200, shift: -3 },
+      { rank: 37, name: "Dean Withers", nat: "AUS", points: 150, shift: 0, wl: [0, 2], played: 2 },
+      { rank: 38, name: "Sonic the Hedgehog", nat: "MOB", points: 150, shift: 0, wl: [0, 2], played: 2 },
+      { rank: 39, name: "Barack Obama", nat: "USA", points: 100, shift: 0 },
+      { rank: 40, name: "Deborah Sater", nat: "RUS", points: 100, shift: 0 },
+      { rank: 41, name: "Kento Nanami", nat: "JPN", points: 100, shift: 0 },
+      { rank: 42, name: "Jacob Elordi", nat: "AUS", points: 50, shift: 0 },
+      { rank: 43, name: "Peter Griffin", nat: "USA", points: 50, shift: 0 }
+    ]
+  },
+  {
+    id: "week4",
+    label: "Week 4 (Post Dubai)",
+    players: [
+      { rank: 1, name: "Jessica", nat: "USA", points: 10050, shift: 0, wl: [8, 2], played: 3 },
+      { rank: 2, name: "Athena", nat: "USA", points: 7030, shift: 1, wl: [4, 3], played: 3 },
+      { rank: 3, name: "Nate", nat: "USA", points: 6980, shift: -1, wl: [2, 3], played: 3 },
+      { rank: 4, name: "Jacob", nat: "USA", points: 6080, shift: 0, wl: [6, 2], played: 3 },
+      { rank: 5, name: "Ellison", nat: "USA", points: 5200, shift: 0, wl: [4, 3], played: 3 },
+      { rank: 6, name: "Raymond", nat: "USA", points: 4880, shift: 0, wl: [1, 3], played: 3 },
+      { rank: 7, name: "Andrew", nat: "KAZ", points: 4650, shift: 0, wl: [3, 3], played: 3 },
+      { rank: 8, name: "Carlos", nat: "USA", points: 4050, shift: 0, wl: [1, 3], played: 3 },
+      { rank: 9, name: "Titus", nat: "CAN", points: 950, shift: 1, wl: [3, 2], played: 2 },
+      { rank: 10, name: "Minecraft Villager", nat: "MCF", points: 900, shift: -1, wl: [3, 1], played: 1 },
+      { rank: 11, name: "Mario", nat: "ITA", points: 700, shift: 0, wl: [4, 1], played: 2 },
+      { rank: 12, name: "Jeon JUNG-KOOK", nat: "KOR", points: 650, shift: 1, wl: [1, 2], played: 2 },
+      { rank: 13, name: "Roronoa Zoro", nat: "JPN", points: 630, shift: -1, wl: [4, 2], played: 2 },
+      { rank: 14, name: "Feraligatr", nat: "PKM", points: 600, shift: 0, wl: [3, 2], played: 2 },
+      { rank: 15, name: "Hatsune Miku", nat: "JPN", points: 500, shift: 1, wl: [2, 2], played: 2 },
+      { rank: 16, name: "Zohran Mamdani", nat: "USA", points: 480, shift: 20, wl: [3, 2], played: 2 },
+      { rank: 17, name: "JonBen\xE9t Ramsey", nat: "USA", points: 400, shift: -2 },
+      { rank: 18, name: "Don Cheadle", nat: "USA", points: 400, shift: -1, wl: [2, 1], played: 1 },
+      { rank: 19, name: "Ashley Guillard", nat: "USA", points: 400, shift: -1, wl: [2, 1], played: 1 },
+      { rank: 20, name: "Satoru Gojo", nat: "JPN", points: 350, shift: -1, wl: [0, 2], played: 2 },
+      { rank: 21, name: "Tate McRae", nat: "CAN", points: 350, shift: -1, wl: [0, 2], played: 2 },
+      { rank: 22, name: "Xitong Wei", nat: "CHN", points: 350, shift: 0, wl: [1, 2], played: 2 },
+      { rank: 23, name: "Batman", nat: "USA", points: 300, shift: -2, wl: [2, 2], played: 2 },
+      { rank: 24, name: "Denji", nat: "JPN", points: 300, shift: 8, wl: [1, 2], played: 2 },
+      { rank: 25, name: "Herobrine", nat: "MCF", points: 250, shift: -2, wl: [0, 2], played: 2 },
+      { rank: 26, name: "Dick Pump", nat: "USA", points: 250, shift: -2, wl: [1, 2], played: 2 },
+      { rank: 27, name: "Luigi", nat: "ITA", points: 250, shift: 7, wl: [0, 2], played: 2 },
+      { rank: 28, name: "Abraham Lincoln", nat: "USA", points: 200, shift: -3 },
+      { rank: 29, name: "Benson Boone", nat: "USA", points: 200, shift: -3 },
+      { rank: 30, name: "Doomfist", nat: "NGR", points: 200, shift: -3 },
+      { rank: 31, name: "Jigglypuff", nat: "PKM", points: 200, shift: -3, wl: [0, 1], played: 1 },
+      { rank: 32, name: "Ludwig Ahgren", nat: "USA", points: 200, shift: -3 },
+      { rank: 33, name: "Taylor Swift", nat: "USA", points: 200, shift: -3 },
+      { rank: 34, name: "Darth Vader", nat: "EMP", points: 200, shift: -3, wl: [0, 1], played: 1 },
+      { rank: 35, name: "Katniss Everdeen", nat: "PAN", points: 200, shift: -2, wl: [0, 1], played: 1 },
+      { rank: 36, name: "Jonathan Bailey", nat: "GBR", points: 150, shift: -1, wl: [0, 1], played: 1 },
+      { rank: 37, name: "Dean Withers", nat: "AUS", points: 100, shift: 1, wl: [0, 2], played: 2 },
+      { rank: 38, name: "Barack Obama", nat: "USA", points: 100, shift: -1 },
+      { rank: 39, name: "Deborah Sater", nat: "RUS", points: 100, shift: 0 },
+      { rank: 40, name: "Kento Nanami", nat: "JPN", points: 100, shift: 0 },
+      { rank: 41, name: "Sonic the Hedgehog", nat: "MOB", points: 100, shift: 0, wl: [0, 1], played: 1 },
+      { rank: 42, name: "Jacob Elordi", nat: "AUS", points: 50, shift: 0 },
+      { rank: 43, name: "Peter Griffin", nat: "USA", points: 50, shift: 0 }
+    ]
+  },
+  {
+    id: "week3",
+    label: "Week 3 (Post Melbourne)",
+    players: [
+      { rank: 1, name: "Jessica", nat: "USA", points: 10350, shift: 0, wl: [6, 1], played: 2 },
+      { rank: 2, name: "Nate", nat: "USA", points: 7130, shift: 1, wl: [2, 2], played: 2 },
+      { rank: 3, name: "Athena", nat: "USA", points: 6930, shift: -1, wl: [2, 2], played: 2 },
+      { rank: 4, name: "Jacob", nat: "USA", points: 5680, shift: 0, wl: [2, 2], played: 2 },
+      { rank: 5, name: "Ellison", nat: "USA", points: 5030, shift: 2, wl: [4, 2], played: 2 },
+      { rank: 6, name: "Raymond", nat: "USA", points: 5030, shift: -1, wl: [1, 2], played: 2 },
+      { rank: 7, name: "Andrew", nat: "KAZ", points: 4650, shift: 1, wl: [2, 2], played: 2 },
+      { rank: 8, name: "Carlos", nat: "USA", points: 4280, shift: -2, wl: [0, 2], played: 2 },
+      { rank: 9, name: "Minecraft Villager", nat: "MCF", points: 900, shift: 24, wl: [3, 1], played: 1 },
+      { rank: 10, name: "Titus", nat: "CAN", points: 900, shift: 24, wl: [3, 1], played: 1 },
+      { rank: 11, name: "Mario", nat: "ITA", points: 700, shift: -2, wl: [4, 1], played: 2 },
+      { rank: 12, name: "Roronoa Zoro", nat: "JPN", points: 630, shift: -2, wl: [4, 2], played: 2 },
+      { rank: 13, name: "Jeon JUNG-KOOK", nat: "KOR", points: 600, shift: -2, wl: [1, 1], played: 1 },
+      { rank: 14, name: "Feraligatr", nat: "PKM", points: 500, shift: 8, wl: [3, 2], played: 2 },
+      { rank: 15, name: "JonBen\xE9t Ramsey", nat: "USA", points: 400, shift: -3 },
+      { rank: 16, name: "Hatsune Miku", nat: "JPN", points: 400, shift: 2, wl: [1, 1], played: 1 },
+      { rank: 17, name: "Don Cheadle", nat: "USA", points: 400, shift: 24, wl: [2, 1], played: 1 },
+      { rank: 18, name: "Ashley Guillard", nat: "USA", points: 400, shift: 25, wl: [2, 1], played: 1 },
+      { rank: 19, name: "Satoru Gojo", nat: "JPN", points: 350, shift: -6, wl: [0, 2], played: 2 },
+      { rank: 20, name: "Tate McRae", nat: "CAN", points: 350, shift: -6, wl: [0, 2], played: 2 },
+      { rank: 21, name: "Batman", nat: "USA", points: 300, shift: 2, wl: [2, 2], played: 2 },
+      { rank: 22, name: "Xitong Wei", nat: "CHN", points: 300, shift: 13, wl: [1, 1], played: 1 },
+      { rank: 23, name: "Herobrine", nat: "MCF", points: 250, shift: 1, wl: [0, 2], played: 2 },
+      { rank: 24, name: "Dick Pump", nat: "USA", points: 250, shift: 16, wl: [1, 2], played: 2 },
+      { rank: 25, name: "Abraham Lincoln", nat: "USA", points: 200, shift: -10 },
+      { rank: 26, name: "Benson Boone", nat: "USA", points: 200, shift: -10 },
+      { rank: 27, name: "Doomfist", nat: "NGR", points: 200, shift: -10 },
+      { rank: 28, name: "Jigglypuff", nat: "PKM", points: 200, shift: -9, wl: [0, 1], played: 1 },
+      { rank: 29, name: "Ludwig Ahgren", nat: "USA", points: 200, shift: -9 },
+      { rank: 30, name: "Taylor Swift", nat: "USA", points: 200, shift: -9 },
+      { rank: 31, name: "Darth Vader", nat: "EMP", points: 200, shift: -5, wl: [0, 1], played: 1 },
+      { rank: 32, name: "Denji", nat: "JPN", points: 200, shift: -3, wl: [0, 1], played: 1 },
+      { rank: 33, name: "Katniss Everdeen", nat: "PAN", points: 200, shift: -3, wl: [0, 1], played: 1 },
+      { rank: 34, name: "Luigi", nat: "ITA", points: 200, shift: -2, wl: [0, 1], played: 1 },
+      { rank: 35, name: "Jonathan Bailey", nat: "GBR", points: 150, shift: 2, wl: [0, 1], played: 1 },
+      { rank: 36, name: "Zohran Mamdani", nat: "USA", points: 100, shift: 3, wl: [0, 1], played: 1 },
+      { rank: 37, name: "Barack Obama", nat: "USA", points: 100, shift: -12 },
+      { rank: 38, name: "Dean Withers", nat: "AUS", points: 100, shift: -11, wl: [0, 1], played: 1 },
+      { rank: 39, name: "Deborah Sater", nat: "RUS", points: 100, shift: -11 },
+      { rank: 40, name: "Kento Nanami", nat: "JPN", points: 100, shift: -9 },
+      { rank: 41, name: "Sonic the Hedgehog", nat: "MOB", points: 100, shift: 1, wl: [0, 1], played: 1 },
+      { rank: 42, name: "Jacob Elordi", nat: "AUS", points: 50, shift: -6 },
+      { rank: 43, name: "Peter Griffin", nat: "USA", points: 50, shift: -5 }
+    ]
+  },
+  {
+    id: "week1",
+    label: "Week 1 (Post Auckland)",
+    players: [
+      { rank: 1, name: "Jessica", nat: "USA", points: 8950, shift: 0, wl: [1, 1], played: 1 },
+      { rank: 2, name: "Athena", nat: "USA", points: 8730, shift: 0, wl: [1, 1], played: 1 },
+      { rank: 3, name: "Nate", nat: "USA", points: 7330, shift: 0, wl: [1, 1], played: 1 },
+      { rank: 4, name: "Jacob", nat: "USA", points: 6880, shift: 0, wl: [2, 1], played: 1 },
+      { rank: 5, name: "Raymond", nat: "USA", points: 5430, shift: 0, wl: [0, 1], played: 1 },
+      { rank: 6, name: "Carlos", nat: "USA", points: 4980, shift: 1, wl: [0, 1], played: 1 },
+      { rank: 7, name: "Ellison", nat: "USA", points: 4750, shift: -1, wl: [0, 1], played: 1 },
+      { rank: 8, name: "Andrew", nat: "KAZ", points: 4650, shift: 0, wl: [0, 1], played: 1 },
+      { rank: 9, name: "Mario", nat: "ITA", points: 600, shift: 21, wl: [4, 0], played: 1 },
+      { rank: 10, name: "Roronoa Zoro", nat: "JPN", points: 430, shift: 22, wl: [3, 1], played: 1 },
+      { rank: 11, name: "Jeon JUNG-KOOK", nat: "KOR", points: 400, shift: -2 },
+      { rank: 12, name: "JonBen\xE9t Ramsey", nat: "USA", points: 400, shift: -2 },
+      { rank: 13, name: "Satoru Gojo", nat: "JPN", points: 250, shift: 4, wl: [0, 1], played: 1 },
+      { rank: 14, name: "Tate McRae", nat: "CAN", points: 250, shift: 4, wl: [0, 1], played: 1 },
+      { rank: 15, name: "Abraham Lincoln", nat: "USA", points: 200, shift: -4 },
+      { rank: 16, name: "Benson Boone", nat: "USA", points: 200, shift: -4 },
+      { rank: 17, name: "Doomfist", nat: "NGR", points: 200, shift: -4 },
+      { rank: 18, name: "Hatsune Miku", nat: "JPN", points: 200, shift: -4 },
+      { rank: 19, name: "Jigglypuff", nat: "PKM", points: 200, shift: -4 },
+      { rank: 20, name: "Ludwig Ahgren", nat: "USA", points: 200, shift: -4 },
+      { rank: 21, name: "Taylor Swift", nat: "USA", points: 200, shift: -2 },
+      { rank: 22, name: "Feraligatr", nat: "PKM", points: 200, shift: 3, wl: [1, 1], played: 1 },
+      { rank: 23, name: "Batman", nat: "USA", points: 200, shift: 19, wl: [2, 1], played: 1 },
+      { rank: 24, name: "Herobrine", nat: "MCF", points: 150, shift: 2, wl: [0, 1], played: 1 },
+      { rank: 25, name: "Barack Obama", nat: "USA", points: 100, shift: -5 },
+      { rank: 26, name: "Darth Vader", nat: "EMP", points: 100, shift: -5 },
+      { rank: 27, name: "Dean Withers", nat: "AUS", points: 100, shift: -5 },
+      { rank: 28, name: "Deborah Sater", nat: "RUS", points: 100, shift: -5 },
+      { rank: 29, name: "Denji", nat: "JPN", points: 100, shift: -5 },
+      { rank: 30, name: "Katniss Everdeen", nat: "PAN", points: 100, shift: -3 },
+      { rank: 31, name: "Kento Nanami", nat: "JPN", points: 100, shift: -3 },
+      { rank: 32, name: "Luigi", nat: "ITA", points: 100, shift: -3 },
+      { rank: 33, name: "Minecraft Villager", nat: "MCF", points: 100, shift: -2 },
+      { rank: 34, name: "Titus", nat: "CAN", points: 100, shift: 0 },
+      { rank: 35, name: "Xitong Wei", nat: "CHN", points: 100, shift: 0 },
+      { rank: 36, name: "Jacob Elordi", nat: "AUS", points: 50, shift: 0 },
+      { rank: 37, name: "Jonathan Bailey", nat: "GBR", points: 50, shift: 0 },
+      { rank: 38, name: "Peter Griffin", nat: "USA", points: 50, shift: 0 },
+      { rank: 39, name: "Zohran Mamdani", nat: "USA", points: 50, shift: 0 },
+      { rank: 40, name: "Dick Pump", nat: "USA", points: 50, shift: 0, wl: [0, 1], played: 1 },
+      { rank: 41, name: "Don Cheadle", nat: "USA", points: 0, shift: -2 },
+      { rank: 42, name: "Sonic the Hedgehog", nat: "MOB", points: 0, shift: -1 },
+      { rank: 43, name: "Ashley Guillard", nat: "USA", points: 0, shift: 0 }
+    ]
+  }
+];
+const PLAYERS = RANKINGS_SNAPSHOTS[0].players;
+const FED_COLORS = {
+  USA: { bg: "#dbeafe", text: "#1d4ed8" },
+  CAN: { bg: "#fee2e2", text: "#b91c1c" },
+  ITA: { bg: "#dcfce7", text: "#15803d" },
+  KOR: { bg: "#fce7f3", text: "#be185d" },
+  JPN: { bg: "#fff1f2", text: "#e11d48" },
+  GBR: { bg: "#ede9fe", text: "#6d28d9" },
+  AUS: { bg: "#fef3c7", text: "#b45309" },
+  CHN: { bg: "#fee2e2", text: "#dc2626" },
+  NGR: { bg: "#dcfce7", text: "#16a34a" },
+  MCF: { bg: "#d1fae5", text: "#065f46" },
+  PKM: { bg: "#fef9c3", text: "#a16207" },
+  EMP: { bg: "#f1f5f9", text: "#334155" },
+  PAN: { bg: "#fff7ed", text: "#c2410c" },
+  MOB: { bg: "#ecfdf5", text: "#059669" }
+};
+const PLAYER_AVATARS = {
+  "Andrew": "",
+  "Athena": "",
+  "Carlos": "",
+  "Ellison": "",
+  "Jacob": "",
+  "Jessica": "",
+  "Nate": "",
+  "Raymond": "",
+  "Abraham Lincoln": "",
+  "Benson Boone": "",
+  "Dean Withers": "",
+  "Denji": "",
+  "Doomfist": "",
+  "Feraligatr": "",
+  "Hatsune Miku": "",
+  "Darth Vader": "",
+  "Herobrine": "",
+  "Jacob Elordi": "",
+  "Jeon JUNG-KOOK": "",
+  "Jigglypuff": "",
+  "Jonathan Bailey": "",
+  "Katniss Everdeen": "",
+  "Kento Nanami": "",
+  "Ludwig Ahgren": "",
+  "Luigi": "",
+  "Mario": "",
+  "Minecraft Villager": "",
+  "Peter Griffin": "",
+  "Roronoa Zoro": "",
+  "Satoru Gojo": "",
+  "Tate McRae": "",
+  "Taylor Swift": "",
+  "Titus": "",
+  "Xitong Wei": "",
+  "Zohran Mamdani": "",
+  "Batman": "",
+  "Dick Pump": "",
+  "Ashley Guillard": "",
+  "Don Cheadle": "",
+  "Sonic the Hedgehog": "",
+  "Barack Obama": "",
+  "JonBen\xE9t Ramsey": ""
+};
+function PlayerAvatar({ name, nat, size = 32 }) {
+  const portrait = PLAYER_AVATARS[name];
+  if (portrait) {
+    return /* @__PURE__ */ React.createElement("div", { style: { width: size, height: size, borderRadius: "50%", overflow: "hidden", flexShrink: 0, background: "#f3f4f6", border: "1.5px solid #e5e7eb" } }, /* @__PURE__ */ React.createElement("img", { src: portrait, alt: name, style: { width: "100%", height: "100%", objectFit: "contain", objectPosition: "center bottom" } }));
+  }
+  const fc = FED_COLORS[nat] || { bg: "#f3f4f6", text: "#6b7280" };
+  const initials = (name || "?").split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+  return /* @__PURE__ */ React.createElement("div", { style: {
+    width: size,
+    height: size,
+    borderRadius: "50%",
+    background: fc.bg,
+    color: fc.text,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: size * 0.35,
+    fontWeight: 800,
+    flexShrink: 0,
+    border: `1.5px solid ${fc.text}22`,
+    letterSpacing: 0
+  } }, initials);
+}
+const NAT_FULL = {
+  USA: "United States",
+  CAN: "Canada",
+  ITA: "Italy",
+  KOR: "South Korea",
+  JPN: "Japan",
+  GBR: "Great Britain",
+  AUS: "Australia",
+  CHN: "China",
+  NGR: "Nigeria",
+  KAZ: "Kazakhstan",
+  RUS: "Russia",
+  MCF: "Minecraft Federation",
+  PKM: "Pok\xE9mon",
+  EMP: "Galactic Empire",
+  PAN: "Panem",
+  MOB: "Mobius"
+};
+const TIER_STYLE = {
+  MAJOR: { color: "#b91c1c", bg: "#fef2f2", border: "#fecaca" },
+  "1000": { color: "#92400e", bg: "#fffbeb", border: "#fde68a" },
+  "500": { color: "#1e40af", bg: "#eff6ff", border: "#bfdbfe" },
+  Finals: { color: "#6b21a8", bg: "#faf5ff", border: "#e9d5ff" }
+};
+const BRACKET_DATA = {
+  1: {
+    champion: "Mario",
+    seeds: { "Jessica": 1, "Athena": 2, "Nate": 3, "Jacob": 4 },
+    rounds: [
+      [
+        { p1: "Jessica", p2: "Dick Pump", s1: 2, s2: 0, w: "Jessica" },
+        { p1: "Roronoa Zoro", p2: "Ellison", s1: 2, s2: 0, w: "Roronoa Zoro" },
+        { p1: "Carlos", p2: "Batman", s1: 0, s2: 2, w: "Batman" },
+        { p1: "Tate McRae", p2: "Nate", s1: 1, s2: 2, w: "Nate" },
+        { p1: "Jacob", p2: "Herobrine", s1: 2, s2: 0, w: "Jacob" },
+        { p1: "Feraligatr", p2: "Andrew", s1: 2, s2: 1, w: "Feraligatr" },
+        { p1: "Raymond", p2: "Mario", s1: 1, s2: 2, w: "Mario" },
+        { p1: "Satoru Gojo", p2: "Athena", s1: 0, s2: 2, w: "Athena" }
+      ],
+      [
+        { p1: "Jessica", p2: "Roronoa Zoro", s1: 1, s2: 2, w: "Roronoa Zoro" },
+        { p1: "Batman", p2: "Nate", s1: 2, s2: 1, w: "Batman" },
+        { p1: "Jacob", p2: "Feraligatr", s1: 2, s2: 1, w: "Jacob" },
+        { p1: "Mario", p2: "Athena", s1: 2, s2: 1, w: "Mario" }
+      ],
+      [
+        { p1: "Roronoa Zoro", p2: "Batman", s1: 2, s2: 1, w: "Roronoa Zoro" },
+        { p1: "Jacob", p2: "Mario", s1: 0, s2: 2, w: "Mario" }
+      ],
+      [
+        { p1: "Roronoa Zoro", p2: "Mario", s1: 1, s2: 2, w: "Mario" }
+      ]
+    ]
+  },
+  2: {
+    champion: "Jessica",
+    seeds: { "Jessica": 1, "Athena": 2, "Nate": 3, "Jacob": 4, "Raymond": 5, "Ellison": 6, "Carlos": 7, "Andrew": 8 },
+    rounds: [
+      // Round 1 (16 matches, 32-draw MAJOR)
+      [
+        { p1: "Jessica", p2: "Luigi", s1: 3, s2: 2, w: "Jessica" },
+        { p1: "Dick Pump", p2: "Katniss Everdeen", s1: 3, s2: 1, w: "Dick Pump" },
+        { p1: "Xitong Wei", p2: "Batman", s1: 3, s2: 0, w: "Xitong Wei" },
+        { p1: "Sonic the Hedgehog", p2: "Andrew", s1: 2, s2: 3, w: "Andrew" },
+        { p1: "Carlos", p2: "Jeon JUNG-KOOK", s1: 1, s2: 3, w: "Jeon JUNG-KOOK" },
+        { p1: "Minecraft Villager", p2: "Satoru Gojo", s1: 3, s2: 0, w: "Minecraft Villager" },
+        { p1: "Feraligatr", p2: "Jigglypuff", s1: 3, s2: 2, w: "Feraligatr" },
+        { p1: "Tate McRae", p2: "Nate", s1: 0, s2: 3, w: "Nate" },
+        { p1: "Jacob", p2: "Roronoa Zoro", s1: 1, s2: 3, w: "Roronoa Zoro" },
+        { p1: "Titus", p2: "Herobrine", s1: 3, s2: 0, w: "Titus" },
+        { p1: "Ashley Guillard", p2: "Darth Vader", s1: 3, s2: 0, w: "Ashley Guillard" },
+        { p1: "Dean Withers", p2: "Raymond", s1: 2, s2: 3, w: "Raymond" },
+        { p1: "Ellison", p2: "Mario", s1: 3, s2: 2, w: "Ellison" },
+        { p1: "Hatsune Miku", p2: "Jonathan Bailey", s1: 3, s2: 2, w: "Hatsune Miku" },
+        { p1: "Don Cheadle", p2: "Zohran Mamdani", s1: 3, s2: 2, w: "Don Cheadle" },
+        { p1: "Denji", p2: "Athena", s1: 2, s2: 3, w: "Athena" }
+      ],
+      // Round 2
+      [
+        { p1: "Jessica", p2: "Dick Pump", s1: 3, s2: 1, w: "Jessica" },
+        { p1: "Andrew", p2: "Xitong Wei", s1: 3, s2: 1, w: "Andrew" },
+        { p1: "Minecraft Villager", p2: "Jeon JUNG-KOOK", s1: 3, s2: 1, w: "Minecraft Villager" },
+        { p1: "Feraligatr", p2: "Nate", s1: 3, s2: 0, w: "Feraligatr" },
+        { p1: "Titus", p2: "Roronoa Zoro", s1: 3, s2: 1, w: "Titus" },
+        { p1: "Ashley Guillard", p2: "Raymond", s1: 3, s2: 1, w: "Ashley Guillard" },
+        { p1: "Ellison", p2: "Hatsune Miku", s1: 3, s2: 2, w: "Ellison" },
+        { p1: "Don Cheadle", p2: "Athena", s1: 3, s2: 0, w: "Don Cheadle" }
+      ],
+      // Round 3
+      [
+        { p1: "Jessica", p2: "Andrew", s1: 3, s2: 1, w: "Jessica" },
+        { p1: "Minecraft Villager", p2: "Feraligatr", s1: 3, s2: 1, w: "Minecraft Villager" },
+        { p1: "Titus", p2: "Ashley Guillard", s1: 3, s2: 2, w: "Titus" },
+        { p1: "Ellison", p2: "Don Cheadle", s1: 3, s2: 0, w: "Ellison" }
+      ],
+      // Semifinals
+      [
+        { p1: "Jessica", p2: "Minecraft Villager", s1: 3, s2: 0, w: "Jessica" },
+        { p1: "Ellison", p2: "Titus", s1: 3, s2: 1, w: "Ellison" }
+      ],
+      // Final
+      [
+        { p1: "Jessica", p2: "Ellison", s1: 3, s2: 2, w: "Jessica" }
+      ]
+    ]
+  },
+  3: {
+    champion: "Jacob",
+    seeds: { "Jessica": 1, "Nate": 2, "Athena": 3, "Jacob": 4 },
+    rounds: [
+      // Round 1
+      [
+        { p1: "Jessica", p2: "Xitong Wei", s1: 2, s2: 0, w: "Jessica" },
+        { p1: "Andrew", p2: "Luigi", s1: 2, s2: 0, w: "Andrew" },
+        { p1: "Denji", p2: "Raymond", s1: 2, s2: 1, w: "Denji" },
+        { p1: "Titus", p2: "Jacob", s1: 0, s2: 2, w: "Jacob" },
+        { p1: "Athena", p2: "Jeon JUNG-KOOK", s1: 2, s2: 1, w: "Athena" },
+        { p1: "Carlos", p2: "Dean Withers", s1: 2, s2: 1, w: "Carlos" },
+        { p1: "Hatsune Miku", p2: "Ellison", s1: 2, s2: 1, w: "Hatsune Miku" },
+        { p1: "Zohran Mamdani", p2: "Nate", s1: 2, s2: 0, w: "Zohran Mamdani" }
+      ],
+      // Quarterfinals
+      [
+        { p1: "Jessica", p2: "Andrew", s1: 2, s2: 1, w: "Jessica" },
+        { p1: "Jacob", p2: "Denji", s1: 2, s2: 0, w: "Jacob" },
+        { p1: "Athena", p2: "Carlos", s1: 2, s2: 1, w: "Athena" },
+        { p1: "Zohran Mamdani", p2: "Hatsune Miku", s1: 2, s2: 1, w: "Zohran Mamdani" }
+      ],
+      // Semifinals
+      [
+        { p1: "Jacob", p2: "Jessica", s1: 2, s2: 0, w: "Jacob" },
+        { p1: "Zohran Mamdani", p2: "Athena", s1: 2, s2: 1, w: "Zohran Mamdani" }
+      ],
+      // Final
+      [
+        { p1: "Jacob", p2: "Zohran Mamdani", s1: 2, s2: 0, w: "Jacob" }
+      ]
+    ]
+  },
+  4: {
+    champion: "Jonathan Bailey",
+    seeds: { "Jessica": 1, "Athena": 2, "Nate": 3, "Jacob": 4 },
+    rounds: [
+      // Round 1
+      [
+        { p1: "Jessica", p2: "Sonic the Hedgehog", s1: 2, s2: 1, w: "Jessica" },
+        { p1: "Don Cheadle", p2: "Raymond", s1: 2, s2: 0, w: "Don Cheadle" },
+        { p1: "Minecraft Villager", p2: "Carlos", s1: 2, s2: 1, w: "Minecraft Villager" },
+        { p1: "Darth Vader", p2: "Nate", s1: 1, s2: 2, w: "Nate" },
+        { p1: "Jacob", p2: "Katniss Everdeen", s1: 2, s2: 0, w: "Jacob" },
+        { p1: "Ashley Guillard", p2: "Ellison", s1: 2, s2: 0, w: "Ashley Guillard" },
+        { p1: "Jonathan Bailey", p2: "Andrew", s1: 2, s2: 0, w: "Jonathan Bailey" },
+        { p1: "Jigglypuff", p2: "Athena", s1: 2, s2: 0, w: "Jigglypuff" }
+      ],
+      // Quarterfinals
+      [
+        { p1: "Jessica", p2: "Don Cheadle", s1: 2, s2: 0, w: "Jessica" },
+        { p1: "Minecraft Villager", p2: "Nate", s1: 1, s2: 2, w: "Nate" },
+        { p1: "Jacob", p2: "Ashley Guillard", s1: 2, s2: 1, w: "Jacob" },
+        { p1: "Jonathan Bailey", p2: "Jigglypuff", s1: 2, s2: 0, w: "Jonathan Bailey" }
+      ],
+      // Semifinals
+      [
+        { p1: "Nate", p2: "Jessica", s1: 2, s2: 0, w: "Nate" },
+        { p1: "Jacob", p2: "Jonathan Bailey", s1: 0, s2: 2, w: "Jonathan Bailey" }
+      ],
+      // Final
+      [
+        { p1: "Nate", p2: "Jonathan Bailey", s1: 1, s2: 2, w: "Jonathan Bailey" }
+      ]
+    ]
+  },
+  5: {
+    champion: "Jacob",
+    drawSize: 32,
+    // render as 32-slot bracket; 8 bye slots fill seed positions
+    seeds: { "Jessica": 1, "Nate": 2, "Athena": 3, "Jacob": 4, "Ellison": 5, "Raymond": 6, "Andrew": 7, "Carlos": 8 },
+    rounds: [
+      // Round 1 — 16 slots. Bye slots (seed entries) use p1=p2=null.
+      // Layout per image (each group of 4 slots = one seed section):
+      // Slot 0:  BYE (1 Jessica)
+      // Slot 1:  Zohran vs Herobrine
+      // Slot 2:  Denji vs Dean Withers
+      // Slot 3:  BYE (8 Carlos)
+      // Slot 4:  BYE (7 Andrew)
+      // Slot 5:  Jeon JUNG-KOOK vs Roronoa Zoro
+      // Slot 6:  Mario vs Satoru Gojo
+      // Slot 7:  BYE (4 Jacob)
+      // Slot 8:  BYE (3 Athena)
+      // Slot 9:  Tate McRae vs Batman
+      // Slot 10: Dick Pump vs Xitong Wei
+      // Slot 11: BYE (5 Ellison)
+      // Slot 12: BYE (6 Raymond)
+      // Slot 13: Titus vs Luigi
+      // Slot 14: Feraligatr vs Hatsune Miku
+      // Slot 15: BYE (2 Nate)
+      [
+        { p1: null, p2: null, s1: null, s2: null, w: null, bye: "Jessica" },
+        { p1: "Zohran Mamdani", p2: "Herobrine", s1: 1, s2: 2, w: "Herobrine" },
+        { p1: "Denji", p2: "Dean Withers", s1: 0, s2: 2, w: "Dean Withers" },
+        { p1: null, p2: null, s1: null, s2: null, w: null, bye: "Carlos" },
+        { p1: null, p2: null, s1: null, s2: null, w: null, bye: "Andrew" },
+        { p1: "Jeon JUNG-KOOK", p2: "Roronoa Zoro", s1: 2, s2: 1, w: "Jeon JUNG-KOOK" },
+        { p1: "Mario", p2: "Satoru Gojo", s1: 1, s2: 2, w: "Satoru Gojo" },
+        { p1: null, p2: null, s1: null, s2: null, w: null, bye: "Jacob" },
+        { p1: null, p2: null, s1: null, s2: null, w: null, bye: "Athena" },
+        { p1: "Tate McRae", p2: "Batman", s1: 0, s2: 2, w: "Batman" },
+        { p1: "Dick Pump", p2: "Xitong Wei", s1: 1, s2: 2, w: "Xitong Wei" },
+        { p1: null, p2: null, s1: null, s2: null, w: null, bye: "Ellison" },
+        { p1: null, p2: null, s1: null, s2: null, w: null, bye: "Raymond" },
+        { p1: "Titus", p2: "Luigi", s1: 0, s2: 2, w: "Luigi" },
+        { p1: "Feraligatr", p2: "Hatsune Miku", s1: 2, s2: 0, w: "Feraligatr" },
+        { p1: null, p2: null, s1: null, s2: null, w: null, bye: "Nate" }
+      ],
+      // Round 2 — 8 matches (R1 winner meets bye seed)
+      // p1=top, p2=bottom. Seeds 1,3,7,6 are top; seeds 8,4,5,2 are bottom.
+      [
+        { p1: "Jessica", p2: "Herobrine", s1: 2, s2: 1, w: "Jessica" },
+        { p1: "Dean Withers", p2: "Carlos", s1: 2, s2: 1, w: "Dean Withers" },
+        { p1: "Andrew", p2: "Jeon JUNG-KOOK", s1: 2, s2: 1, w: "Andrew" },
+        { p1: "Satoru Gojo", p2: "Jacob", s1: 1, s2: 2, w: "Jacob" },
+        { p1: "Athena", p2: "Batman", s1: 2, s2: 1, w: "Athena" },
+        { p1: "Xitong Wei", p2: "Ellison", s1: 1, s2: 2, w: "Ellison" },
+        { p1: "Raymond", p2: "Luigi", s1: 0, s2: 2, w: "Luigi" },
+        { p1: "Feraligatr", p2: "Nate", s1: 1, s2: 2, w: "Nate" }
+      ],
+      // Round 3 (QF equivalent)
+      [
+        { p1: "Jessica", p2: "Dean Withers", s1: 2, s2: 1, w: "Jessica" },
+        { p1: "Andrew", p2: "Jacob", s1: 1, s2: 2, w: "Jacob" },
+        { p1: "Athena", p2: "Ellison", s1: 1, s2: 2, w: "Ellison" },
+        { p1: "Luigi", p2: "Nate", s1: 0, s2: 2, w: "Nate" }
+      ],
+      // Semifinals
+      [
+        { p1: "Jessica", p2: "Jacob", s1: 1, s2: 2, w: "Jacob" },
+        { p1: "Ellison", p2: "Nate", s1: 2, s2: 1, w: "Ellison" }
+      ],
+      // Final
+      [
+        { p1: "Jacob", p2: "Ellison", s1: 2, s2: 1, w: "Jacob" }
+      ]
+    ]
+  },
+  6: {
+    champion: "Ellison",
+    seeds: { "Jessica": 1, "Jacob": 2, "Athena": 3, "Nate": 4 },
+    rounds: [
+      // Round 1
+      [
+        { p1: "Jessica", p2: "Satoru Gojo", s1: 2, s2: 1, w: "Jessica" },
+        { p1: "Tate McRae", p2: "Carlos", s1: 2, s2: 1, w: "Tate McRae" },
+        { p1: "Ellison", p2: "Feraligatr", s1: 2, s2: 0, w: "Ellison" },
+        { p1: "Mario", p2: "Nate", s1: 2, s2: 0, w: "Mario" },
+        { p1: "Athena", p2: "Herobrine", s1: 2, s2: 0, w: "Athena" },
+        { p1: "Raymond", p2: "Batman", s1: 2, s2: 0, w: "Raymond" },
+        { p1: "Andrew", p2: "Roronoa Zoro", s1: 2, s2: 0, w: "Andrew" },
+        { p1: "Dick Pump", p2: "Jacob", s1: 2, s2: 1, w: "Dick Pump" }
+      ],
+      // Quarterfinals
+      [
+        { p1: "Jessica", p2: "Tate McRae", s1: 2, s2: 1, w: "Jessica" },
+        { p1: "Ellison", p2: "Mario", s1: 2, s2: 0, w: "Ellison" },
+        { p1: "Athena", p2: "Raymond", s1: 0, s2: 2, w: "Raymond" },
+        { p1: "Andrew", p2: "Dick Pump", s1: 0, s2: 2, w: "Dick Pump" }
+      ],
+      // Semifinals
+      [
+        { p1: "Jessica", p2: "Ellison", s1: 1, s2: 2, w: "Ellison" },
+        { p1: "Raymond", p2: "Dick Pump", s1: 0, s2: 2, w: "Dick Pump" }
+      ],
+      // Final
+      [
+        { p1: "Ellison", p2: "Dick Pump", s1: 2, s2: 1, w: "Ellison" }
+      ]
+    ]
+  },
+  7: {
+    champion: null,
+    // in progress
+    seeds: { "Jessica": 1, "Jacob": 2, "Athena": 3, "Nate": 4, "Ellison": 5, "Raymond": 6, "Andrew": 7, "Carlos": 8 },
+    rounds: [
+      // Round 1 (16 matches)
+      [
+        { p1: "Jessica", p2: "Jigglypuff", s1: 3, s2: 0, w: "Jessica" },
+        { p1: "Denji", p2: "Dean Withers", s1: 2, s2: 3, w: "Dean Withers" },
+        { p1: "Titus", p2: "Zohran Mamdani", s1: 0, s2: 3, w: "Zohran Mamdani" },
+        { p1: "Satoru Gojo", p2: "Ellison", s1: 2, s2: 3, w: "Ellison" },
+        { p1: "Carlos", p2: "Mario", s1: 2, s2: 3, w: "Mario" },
+        { p1: "Jeon JUNG-KOOK", p2: "Sonic the Hedgehog", s1: 3, s2: 0, w: "Jeon JUNG-KOOK" },
+        { p1: "Katniss Everdeen", p2: "Don Cheadle", s1: 3, s2: 1, w: "Katniss Everdeen" },
+        { p1: "Tate McRae", p2: "Athena", s1: 3, s2: 0, w: "Tate McRae" },
+        { p1: "Nate", p2: "Hatsune Miku", s1: 2, s2: 3, w: "Hatsune Miku" },
+        { p1: "Jonathan Bailey", p2: "Darth Vader", s1: 3, s2: 2, w: "Jonathan Bailey" },
+        { p1: "Minecraft Villager", p2: "Luigi", s1: 3, s2: 0, w: "Minecraft Villager" },
+        { p1: "Xitong Wei", p2: "Raymond", s1: 0, s2: 3, w: "Raymond" },
+        { p1: "Andrew", p2: "Ashley Guillard", s1: 3, s2: 0, w: "Andrew" },
+        { p1: "Dick Pump", p2: "Herobrine", s1: 1, s2: 3, w: "Herobrine" },
+        { p1: "Batman", p2: "Feraligatr", s1: 0, s2: 3, w: "Feraligatr" },
+        { p1: "Roronoa Zoro", p2: "Jacob", s1: 1, s2: 3, w: "Jacob" }
+      ],
+      // Round 2 (8 matches)
+      [
+        { p1: "Jessica", p2: "Dean Withers", s1: 1, s2: 3, w: "Dean Withers" },
+        { p1: "Zohran Mamdani", p2: "Ellison", s1: 3, s2: 1, w: "Zohran Mamdani" },
+        { p1: "Mario", p2: "Jeon JUNG-KOOK", s1: 3, s2: 1, w: "Mario" },
+        { p1: "Katniss Everdeen", p2: "Tate McRae", s1: 1, s2: 3, w: "Tate McRae" },
+        { p1: "Hatsune Miku", p2: "Jonathan Bailey", s1: 2, s2: 3, w: "Jonathan Bailey" },
+        { p1: "Minecraft Villager", p2: "Raymond", s1: 0, s2: 3, w: "Raymond" },
+        { p1: "Herobrine", p2: "Andrew", s1: 3, s2: 2, w: "Herobrine" },
+        { p1: "Feraligatr", p2: "Jacob", s1: 3, s2: 0, w: "Feraligatr" }
+      ],
+      // Round 3
+      [
+        { p1: "Dean Withers", p2: "Zohran Mamdani", s1: 1, s2: 3, w: "Zohran Mamdani" },
+        { p1: "Mario", p2: "Tate McRae", s1: 3, s2: 0, w: "Mario" },
+        { p1: "Jonathan Bailey", p2: "Raymond", s1: 2, s2: 3, w: "Raymond" },
+        { p1: "Herobrine", p2: "Feraligatr", s1: 1, s2: 3, w: "Feraligatr" }
+      ],
+      // Semifinals — not yet played
+      [
+        { p1: "Zohran Mamdani", p2: "Mario", s1: 1, s2: 3, w: "Mario" },
+        { p1: "Raymond", p2: "Feraligatr", s1: 3, s2: 0, w: "Raymond" }
+      ],
+      // Final
+      [
+        { p1: "Mario", p2: "Raymond", s1: 3, s2: 2, w: "Mario" }
+      ]
+    ],
+    champion: "Mario"
+  },
+  8: {
+    seeds: { "Jessica": 1, "Jacob": 2, "Ellison": 3, "Athena": 4, "Raymond": 5, "Andrew": 6, "Nate": 7, "Carlos": 8 },
+    drawSize: 32,
+    rounds: [
+      // Round 1 — 16 slots. Seeds get bye slots on outer positions.
+      // Slot 0:  BYE (1 Jessica)
+      // Slot 1:  Jonathan Bailey vs Luigi
+      // Slot 2:  Denji vs Ashley Guillard
+      // Slot 3:  BYE (7 Nate)
+      // Slot 4:  BYE (6 Andrew)
+      // Slot 5:  Jigglypuff vs Xitong Wei
+      // Slot 6:  Dean Withers vs Titus
+      // Slot 7:  BYE (4 Athena)
+      // Slot 8:  BYE (3 Ellison)
+      // Slot 9:  Minecraft Villager vs Katniss Everdeen
+      // Slot 10: Sonic the Hedgehog vs Darth Vader
+      // Slot 11: BYE (5 Raymond)
+      // Slot 12: BYE (8 Carlos)
+      // Slot 13: Hatsune Miku vs Don Cheadle
+      // Slot 14: Jeon JUNG-KOOK vs Zohran Mamdani
+      // Slot 15: BYE (2 Jacob)
+      [
+        { p1: null, p2: null, s1: null, s2: null, w: null, bye: "Jessica" },
+        { p1: "Jonathan Bailey", p2: "Luigi", s1: 0, s2: 2, w: "Luigi" },
+        { p1: "Denji", p2: "Ashley Guillard", s1: 0, s2: 2, w: "Ashley Guillard" },
+        { p1: null, p2: null, s1: null, s2: null, w: null, bye: "Nate" },
+        { p1: null, p2: null, s1: null, s2: null, w: null, bye: "Andrew" },
+        { p1: "Jigglypuff", p2: "Xitong Wei", s1: 2, s2: 0, w: "Jigglypuff" },
+        { p1: "Dean Withers", p2: "Titus", s1: 1, s2: 2, w: "Titus" },
+        { p1: null, p2: null, s1: null, s2: null, w: null, bye: "Athena" },
+        { p1: null, p2: null, s1: null, s2: null, w: null, bye: "Ellison" },
+        { p1: "Minecraft Villager", p2: "Katniss Everdeen", s1: 2, s2: 0, w: "Minecraft Villager" },
+        { p1: "Sonic the Hedgehog", p2: "Darth Vader", s1: 1, s2: 2, w: "Darth Vader" },
+        { p1: null, p2: null, s1: null, s2: null, w: null, bye: "Raymond" },
+        { p1: null, p2: null, s1: null, s2: null, w: null, bye: "Carlos" },
+        { p1: "Hatsune Miku", p2: "Don Cheadle", s1: 0, s2: 2, w: "Don Cheadle" },
+        { p1: "Jeon JUNG-KOOK", p2: "Zohran Mamdani", s1: 2, s2: 1, w: "Jeon JUNG-KOOK" },
+        { p1: null, p2: null, s1: null, s2: null, w: null, bye: "Jacob" }
+      ],
+      // Round 2 — seeds vs R1 winners
+      [
+        { p1: "Jessica", p2: "Luigi", s1: 2, s2: 0, w: "Jessica" },
+        { p1: "Ashley Guillard", p2: "Nate", s1: 2, s2: 1, w: "Ashley Guillard" },
+        { p1: "Andrew", p2: "Jigglypuff", s1: 2, s2: 1, w: "Andrew" },
+        { p1: "Titus", p2: "Athena", s1: 2, s2: 1, w: "Titus" },
+        { p1: "Ellison", p2: "Minecraft Villager", s1: 1, s2: 2, w: "Minecraft Villager" },
+        { p1: "Darth Vader", p2: "Raymond", s1: 0, s2: 2, w: "Raymond" },
+        { p1: "Carlos", p2: "Don Cheadle", s1: 2, s2: 0, w: "Carlos" },
+        { p1: "Jeon JUNG-KOOK", p2: "Jacob", s1: 2, s2: 1, w: "Jeon JUNG-KOOK" }
+      ],
+      // Round 3
+      [
+        { p1: "Jessica", p2: "Ashley Guillard", s1: 2, s2: 1, w: "Jessica" },
+        { p1: "Andrew", p2: "Titus", s1: 0, s2: 2, w: "Titus" },
+        { p1: "Minecraft Villager", p2: "Raymond", s1: 1, s2: 2, w: "Raymond" },
+        { p1: "Carlos", p2: "Jeon JUNG-KOOK", s1: 2, s2: 0, w: "Carlos" }
+      ],
+      // Semifinals
+      [
+        { p1: "Jessica", p2: "Titus", s1: 2, s2: 0, w: "Jessica" },
+        { p1: "Raymond", p2: "Carlos", s1: 0, s2: 2, w: "Carlos" }
+      ],
+      // Final
+      [
+        { p1: "Jessica", p2: "Carlos", s1: 2, s2: 1, w: "Jessica" }
+      ]
+    ],
+    champion: "Jessica"
+  }
+};
+const ROUND_POINTS = {
+  "500": { "W": 500, "Final": 330, "Semifinals": 200, "Round 2": 100, "Round 1": 50 },
+  "1000": { "W": 1e3, "Final": 650, "Semifinals": 400, "Round 3": 200, "Round 2": 100, "Round 1": 50 },
+  "MAJOR": { "W": 2e3, "Final": 1300, "Semifinals": 800, "Round 3": 400, "Round 2": 200, "Round 1": 100 },
+  "Finals": { "W": 1500, "Final": 1e3, "Semifinals": 500 }
+};
+const POINTS_FOR_REACHING = {
+  "500": { "W": 500, "Final": 330, "Semifinals": 200, "Round 2": 100, "Round 1": 50 },
+  "1000": { "W": 1e3, "Final": 650, "Semifinals": 400, "Round 3": 200, "Round 2": 100, "Round 1": 50 },
+  "MAJOR": { "W": 2e3, "Final": 1300, "Semifinals": 800, "Round 3": 400, "Round 2": 200, "Round 1": 100 },
+  "Finals": { "W": 1500, "Final": 1e3, "Semifinals": 500 }
+};
+function calcTournamentPoints(tier, matches) {
+  const ORDER = ["Round 1", "Round 2", "Round 3", "Semifinals", "Final"];
+  let deepest = null;
+  let wonFinal = false;
+  matches.forEach((m) => {
+    const idx = ORDER.indexOf(m.round);
+    if (deepest === null || idx > ORDER.indexOf(deepest)) {
+      deepest = m.round;
+      wonFinal = m.round === "Final" && m.result === "W";
+    }
+  });
+  if (!deepest) return 0;
+  const table = POINTS_FOR_REACHING[tier] || {};
+  if (deepest === "Final") return wonFinal ? table["W"] || 0 : table["Final"] || 0;
+  return table[deepest] || 0;
+}
+function buildPlayerStats() {
+  const stats = {};
+  const ensure = (n) => {
+    if (!stats[n]) stats[n] = { wins: 0, losses: 0, titles: 0, matches: [], tournamentPoints: {} };
+  };
+  Object.entries(BRACKET_DATA).forEach(([tid, data]) => {
+    const t = TOURNAMENTS.find((t2) => t2.id === Number(tid));
+    if (!t) return;
+    const total = data.rounds.length;
+    const roundLabel = (ri) => {
+      if (ri === total - 1) return "Final";
+      if (ri === total - 2) return "Semifinals";
+      return `Round ${ri + 1}`;
+    };
+    data.rounds.forEach((round, ri) => {
+      round.forEach((m) => {
+        if (!m.w || m.p1 === "TBD" || m.p2 === "TBD") return;
+        ensure(m.p1);
+        ensure(m.p2);
+        const entry = (pn) => ({
+          tournament: t.name,
+          tournamentId: t.id,
+          tier: t.tier,
+          dates: `${t.start} \u2013 ${t.end}`,
+          round: roundLabel(ri),
+          opponent: pn === m.p1 ? m.p2 : m.p1,
+          score: pn === m.p1 ? `${m.s1}\u2013${m.s2}` : `${m.s2}\u2013${m.s1}`,
+          result: m.w === pn ? "W" : "L",
+          champion: data.champion === pn && ri === total - 1 && m.w === pn
+        });
+        stats[m.p1].matches.push(entry(m.p1));
+        stats[m.p2].matches.push(entry(m.p2));
+        if (m.w === m.p1) {
+          stats[m.p1].wins++;
+          stats[m.p2].losses++;
+        } else {
+          stats[m.p2].wins++;
+          stats[m.p1].losses++;
+        }
+      });
+    });
+    if (data.champion) {
+      ensure(data.champion);
+      stats[data.champion].titles++;
+    }
+  });
+  Object.keys(stats).forEach((name) => {
+    const byT = {};
+    stats[name].matches.forEach((m) => {
+      if (!byT[m.tournamentId]) byT[m.tournamentId] = { tier: m.tier, matches: [] };
+      byT[m.tournamentId].matches.push(m);
+    });
+    Object.entries(byT).forEach(([tid, { tier, matches }]) => {
+      stats[name].tournamentPoints[tid] = calcTournamentPoints(tier, matches);
+    });
+  });
+  return stats;
+}
+const PLAYER_STATS = buildPlayerStats();
+const MH = 54, MW = 200, CGAP = 44;
+function TierBadge({ tier }) {
+  const ts = TIER_STYLE[tier] || TIER_STYLE["500"];
+  const label = tier === "MAJOR" ? "MAJOR" : tier === "Finals" ? "FINALS" : `DUDB ${tier}`;
+  return /* @__PURE__ */ React.createElement("span", { style: {
+    fontSize: 11,
+    fontWeight: 700,
+    padding: "2px 8px",
+    borderRadius: 20,
+    background: ts.bg,
+    color: ts.color,
+    border: `1px solid ${ts.border}`,
+    letterSpacing: 0.5,
+    whiteSpace: "nowrap"
+  } }, label);
+}
+function PlayerLink({ name, onOpen, style = {} }) {
+  const has = !!PLAYER_STATS[name];
+  return /* @__PURE__ */ React.createElement(
+    "span",
+    {
+      onClick: has ? (e) => {
+        e.stopPropagation();
+        onOpen(name);
+      } : void 0,
+      style: {
+        cursor: has ? "pointer" : "default",
+        color: has ? "#2563eb" : "inherit",
+        fontWeight: 600,
+        ...style
+      }
+    },
+    name
+  );
+}
+function LiveView({ tournaments, onSelectTournament, onOpenProfile }) {
+  const [showAllMatches, setShowAllMatches] = useState(false);
+  const live = tournaments.filter((t) => t.status === "live");
+  const upcoming = tournaments.filter((t) => t.status === "upcoming").slice(0, 5);
+  const recent = tournaments.filter((t) => t.status === "completed").slice(-3).reverse();
+  const titData = BRACKET_DATA[8];
+  const titTournament = tournaments.find((t) => t.id === 8);
+  const titTotal = titData?.rounds.length || 0;
+  const titRoundLabel = (ri) => {
+    if (ri === titTotal - 1) return "Final";
+    if (ri === titTotal - 2) return "Semifinals";
+    return `Round ${ri + 1}`;
+  };
+  const { featuredMatches, featuredRoundLabel } = (() => {
+    if (!titData) return { featuredMatches: [], featuredRoundLabel: "" };
+    for (let i = 0; i < titData.rounds.length; i++) {
+      const unplayed = titData.rounds[i].filter((m) => !m.w && !m.bye && m.p1 && m.p2 && m.p1 !== "TBD" && m.p2 !== "TBD");
+      if (unplayed.length > 0) return { featuredMatches: unplayed, featuredRoundLabel: titRoundLabel(i) };
+    }
+    return { featuredMatches: [], featuredRoundLabel: "" };
+  })();
+  return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 28 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 14 } }, /* @__PURE__ */ React.createElement("span", { style: { width: 10, height: 10, borderRadius: "50%", background: "#16a34a", display: "inline-block", animation: "pulse 1.5s infinite" } }), /* @__PURE__ */ React.createElement("h2", { style: { margin: 0, fontSize: 22, fontWeight: 800, color: "#111" } }, "Live")), live.length === 0 ? /* @__PURE__ */ React.createElement("div", { style: { background: "#fff", border: "1px solid #e5e7eb", borderRadius: 12, padding: "2rem", textAlign: "center", color: "#9ca3af", fontSize: 15 } }, "No live matches at the moment.") : live.map((t) => /* @__PURE__ */ React.createElement(
+    "div",
+    {
+      key: t.id,
+      onClick: () => onSelectTournament(t),
+      style: { background: "#fff", border: "2px solid #16a34a", borderRadius: 12, padding: "1rem 1.25rem", cursor: "pointer", marginBottom: 8, display: "flex", justifyContent: "space-between", alignItems: "center" }
+    },
+    /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 700, fontSize: 16 } }, t.name), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: "#6b7280" } }, t.location, " \xB7 ", t.start, " \u2013 ", t.end)),
+    /* @__PURE__ */ React.createElement(TierBadge, { tier: t.tier })
+  ))), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 340px", gap: 32, alignItems: "start" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 16 } }, featuredMatches.length > 0 && titTournament && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 12 } }, /* @__PURE__ */ React.createElement("h2", { style: { margin: 0, fontSize: 16, fontWeight: 800, color: "#111" } }, "Upcoming / Live Matches"), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11, fontWeight: 700, background: "#dcfce7", color: "#16a34a", border: "1px solid #bbf7d0", borderRadius: 20, padding: "1px 8px" } }, "LIVE"), featuredMatches.length > 3 && /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      onClick: () => setShowAllMatches((s) => !s),
+      style: { marginLeft: "auto", fontSize: 12, fontWeight: 700, color: "#6b7280", background: "none", border: "1px solid #e5e7eb", borderRadius: 8, padding: "3px 10px", cursor: "pointer" }
+    },
+    showAllMatches ? "Show less \u25B2" : `+${featuredMatches.length - 3} more \u25BC`
+  )), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 10 } }, (showAllMatches ? featuredMatches : featuredMatches.slice(0, 3)).map((m, i) => {
+    const seeds = titData?.seeds || {};
+    return /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        key: i,
+        onClick: () => onSelectTournament(titTournament),
+        style: { background: "#fff", border: "1px solid #e5e7eb", borderRadius: 10, overflow: "hidden", cursor: "pointer", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" },
+        onMouseEnter: (e) => e.currentTarget.style.background = "#f9fafb",
+        onMouseLeave: (e) => e.currentTarget.style.background = "#fff"
+      },
+      /* @__PURE__ */ React.createElement("div", { style: { padding: "6px 14px 4px", fontSize: 11, color: "#6b7280", fontWeight: 600, borderBottom: "1px solid #f3f4f6" } }, "Royal London Cup", " \xB7 ", featuredRoundLabel),
+      /* @__PURE__ */ React.createElement("div", { style: { padding: "10px 14px", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f3f4f6" } }, /* @__PURE__ */ React.createElement(PlayerAvatar, { name: m.p1, nat: PLAYERS.find((p) => p.name === m.p1)?.nat || "USA", size: 32 }), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 10, fontWeight: 700, color: "#9ca3af", minWidth: 14, textAlign: "right", flexShrink: 0 } }, seeds[m.p1] || ""), /* @__PURE__ */ React.createElement(
+        "span",
+        {
+          style: { fontWeight: 700, fontSize: 14, flex: 1 },
+          onClick: (e) => {
+            e.stopPropagation();
+            onOpenProfile(m.p1);
+          }
+        },
+        m.p1
+      )),
+      /* @__PURE__ */ React.createElement("div", { style: { padding: "10px 14px", display: "flex", alignItems: "center", gap: 8 } }, /* @__PURE__ */ React.createElement(PlayerAvatar, { name: m.p2, nat: PLAYERS.find((p) => p.name === m.p2)?.nat || "USA", size: 32 }), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 10, fontWeight: 700, color: "#9ca3af", minWidth: 14, textAlign: "right", flexShrink: 0 } }, seeds[m.p2] || ""), /* @__PURE__ */ React.createElement(
+        "span",
+        {
+          style: { fontWeight: 700, fontSize: 14, flex: 1 },
+          onClick: (e) => {
+            e.stopPropagation();
+            onOpenProfile(m.p2);
+          }
+        },
+        m.p2
+      ))
+    );
+  }))), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h2", { style: { margin: "0 0 12px", fontSize: 16, fontWeight: 800, color: "#111" } }, "Upcoming Tournaments"), /* @__PURE__ */ React.createElement("div", { style: { background: "#fff", border: "1px solid #e5e7eb", borderRadius: 12, overflow: "hidden" } }, upcoming.map((t, i) => /* @__PURE__ */ React.createElement(
+    "div",
+    {
+      key: t.id,
+      onClick: () => onSelectTournament(t),
+      style: {
+        padding: "0.9rem 1.25rem",
+        borderBottom: i < upcoming.length - 1 ? "1px solid #f3f4f6" : "none",
+        cursor: "pointer",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        background: t.tier === "MAJOR" ? "#f5f3ff" : "transparent"
+      },
+      onMouseEnter: (e) => e.currentTarget.style.background = t.tier === "MAJOR" ? "#ede9fe" : "#f9fafb",
+      onMouseLeave: (e) => e.currentTarget.style.background = t.tier === "MAJOR" ? "#f5f3ff" : "transparent"
+    },
+    /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 700, fontSize: 15, color: "#111" } }, t.name), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: "#9ca3af", marginTop: 2 } }, t.location)),
+    /* @__PURE__ */ React.createElement("div", { style: { textAlign: "right" } }, /* @__PURE__ */ React.createElement(TierBadge, { tier: t.tier }), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: "#9ca3af", marginTop: 4 } }, t.start, " \u2013 ", t.end))
+  ))))), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h2", { style: { margin: "0 0 12px", fontSize: 16, fontWeight: 800, color: "#111" } }, "Top 10"), /* @__PURE__ */ React.createElement("div", { style: { background: "#fff", border: "1px solid #e5e7eb", borderRadius: 12, overflow: "hidden" } }, PLAYERS.slice(0, 10).map((p, i) => /* @__PURE__ */ React.createElement(
+    "div",
+    {
+      key: p.name,
+      onClick: () => onOpenProfile(p.name),
+      style: {
+        padding: "0.75rem 1.25rem",
+        borderBottom: i < 9 ? "1px solid #f3f4f6" : "none",
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
+        cursor: "pointer"
+      },
+      onMouseEnter: (e) => e.currentTarget.style.background = "#f9fafb",
+      onMouseLeave: (e) => e.currentTarget.style.background = "transparent"
+    },
+    /* @__PURE__ */ React.createElement("span", { style: { fontSize: 13, fontWeight: 700, color: i < 3 ? "#111" : "#6b7280", width: 20, textAlign: "right" } }, p.rank),
+    /* @__PURE__ */ React.createElement(PlayerAvatar, { name: p.name, nat: p.nat, size: 28 }),
+    /* @__PURE__ */ React.createElement("span", { style: { fontSize: 14, fontWeight: 600, color: "#111", flex: 1 } }, p.name),
+    /* @__PURE__ */ React.createElement("span", { style: { fontSize: 13, color: "#6b7280", fontVariantNumeric: "tabular-nums" } }, p.points.toLocaleString(), " pts")
+  ))))), recent.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 32 } }, /* @__PURE__ */ React.createElement("h2", { style: { margin: "0 0 14px", fontSize: 16, fontWeight: 800, color: "#111" } }, "Recent Results"), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(280px,1fr))", gap: 12 } }, recent.map((t) => {
+    const bd = BRACKET_DATA[t.id];
+    return /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        key: t.id,
+        onClick: () => onSelectTournament(t),
+        style: { background: "#fff", border: "1px solid #e5e7eb", borderRadius: 12, padding: "1rem 1.25rem", cursor: "pointer" },
+        onMouseEnter: (e) => e.currentTarget.style.background = "#f9fafb",
+        onMouseLeave: (e) => e.currentTarget.style.background = "#fff"
+      },
+      /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start" } }, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 700, fontSize: 15, color: "#111" } }, t.name), /* @__PURE__ */ React.createElement(TierBadge, { tier: t.tier })),
+      /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: "#9ca3af", marginTop: 2 } }, t.location, " \xB7 ", t.end),
+      bd?.champion && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 10, display: "flex", alignItems: "center", gap: 6 } }, /* @__PURE__ */ React.createElement("span", { style: { fontWeight: 600, fontSize: 13, color: "#6b7280" } }, "Champion:"), /* @__PURE__ */ React.createElement(PlayerAvatar, { name: bd.champion, nat: "", size: 22 }), /* @__PURE__ */ React.createElement("span", { style: { fontWeight: 700, fontSize: 14, color: "#111" } }, bd.champion))
+    );
+  }))));
+}
+function TournamentsView({ tournaments, onSelectTournament }) {
+  const [filter, setFilter] = useState("all");
+  const groups = { all: tournaments, upcoming: tournaments.filter((t) => t.status === "upcoming"), completed: tournaments.filter((t) => t.status === "completed") };
+  const shown = groups[filter] || tournaments;
+  return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 } }, /* @__PURE__ */ React.createElement("h2", { style: { margin: 0, fontSize: 22, fontWeight: 800, color: "#111" } }, "2026 Tour Schedule"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 6 } }, ["all", "upcoming", "completed"].map((f) => /* @__PURE__ */ React.createElement("button", { key: f, onClick: () => setFilter(f), style: {
+    padding: "6px 16px",
+    borderRadius: 20,
+    border: "1px solid #e5e7eb",
+    cursor: "pointer",
+    background: filter === f ? "#111" : "#fff",
+    color: filter === f ? "#fff" : "#6b7280",
+    fontSize: 13,
+    fontWeight: 600,
+    textTransform: "capitalize"
+  } }, f)))), /* @__PURE__ */ React.createElement("div", { style: { background: "#fff", border: "1px solid #e5e7eb", borderRadius: 12, overflow: "hidden" } }, shown.map((t, i) => {
+    const bd = BRACKET_DATA[t.id];
+    const champion = bd?.champion;
+    return /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        key: t.id,
+        onClick: () => onSelectTournament(t),
+        style: {
+          padding: "1rem 1.5rem",
+          borderBottom: i < shown.length - 1 ? "1px solid #f3f4f6" : "none",
+          display: "grid",
+          gridTemplateColumns: "1fr 120px 200px 140px",
+          alignItems: "center",
+          gap: 16,
+          cursor: "pointer",
+          background: t.status === "live" ? "#f0fdf4" : t.tier === "MAJOR" ? "#f5f3ff" : "transparent",
+          outline: t.status === "live" ? "2px solid #16a34a" : "none",
+          outlineOffset: "-2px"
+        },
+        onMouseEnter: (e) => e.currentTarget.style.background = t.status === "live" ? "#dcfce7" : t.tier === "MAJOR" ? "#ede9fe" : "#f9fafb",
+        onMouseLeave: (e) => e.currentTarget.style.background = t.status === "live" ? "#f0fdf4" : t.tier === "MAJOR" ? "#f5f3ff" : "transparent"
+      },
+      /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 } }, /* @__PURE__ */ React.createElement("span", { style: { fontWeight: 700, fontSize: 15, color: "#111" } }, t.name), t.status === "live" && /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11, fontWeight: 700, background: "#dcfce7", color: "#16a34a", border: "1px solid #bbf7d0", borderRadius: 20, padding: "1px 8px" } }, "LIVE")), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: "#9ca3af", marginTop: 2 } }, t.location)),
+      /* @__PURE__ */ React.createElement(TierBadge, { tier: t.tier }),
+      /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: "#6b7280" } }, t.start, " \u2013 ", t.end),
+      /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, display: "flex", alignItems: "center", gap: 5 } }, champion ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("span", { style: { fontWeight: 600, color: "#6b7280", whiteSpace: "nowrap" } }, "Champion:"), /* @__PURE__ */ React.createElement(PlayerAvatar, { name: champion, nat: "", size: 24 }), /* @__PURE__ */ React.createElement("span", { style: { fontWeight: 700, color: "#111" } }, champion)) : /* @__PURE__ */ React.createElement("span", { style: { color: t.status === "live" ? "#16a34a" : "#d1d5db", fontSize: 12, fontWeight: t.status === "live" ? 700 : 400 } }, t.status === "upcoming" ? "\u2014" : "In progress"))
+    );
+  })));
+}
+function RankingsView({ onOpenProfile }) {
+  const [search, setSearch] = useState("");
+  const [filterNat, setFilterNat] = useState("ALL");
+  const [snapshotId, setSnapshotId] = useState("week10");
+  const snapshot = RANKINGS_SNAPSHOTS.find((s) => s.id === snapshotId) || RANKINGS_SNAPSHOTS[0];
+  const nats = useMemo(() => ["ALL", ...new Set(snapshot.players.map((p) => p.nat))], [snapshot]);
+  const filtered = useMemo(() => snapshot.players.filter(
+    (p) => (filterNat === "ALL" || p.nat === filterNat) && p.name.toLowerCase().includes(search.toLowerCase())
+  ), [search, filterNat, snapshot]);
+  const isCurrent = snapshotId === "week10";
+  return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexWrap: "wrap", gap: 12 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 12 } }, /* @__PURE__ */ React.createElement("h2", { style: { margin: 0, fontSize: 22, fontWeight: 800, color: "#111" } }, "World Rankings"), /* @__PURE__ */ React.createElement(
+    "select",
+    {
+      value: snapshotId,
+      onChange: (e) => {
+        setSnapshotId(e.target.value);
+        setFilterNat("ALL");
+      },
+      style: { padding: "6px 12px", borderRadius: 8, border: "1px solid #e5e7eb", fontSize: 13, fontWeight: 600, outline: "none", background: "#fff", cursor: "pointer" }
+    },
+    RANKINGS_SNAPSHOTS.map((s) => /* @__PURE__ */ React.createElement("option", { key: s.id, value: s.id }, s.label))
+  )), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8 } }, /* @__PURE__ */ React.createElement(
+    "input",
+    {
+      value: search,
+      onChange: (e) => setSearch(e.target.value),
+      placeholder: "Search...",
+      style: { padding: "8px 14px", borderRadius: 8, border: "1px solid #e5e7eb", fontSize: 14, outline: "none", width: 180 }
+    }
+  ), /* @__PURE__ */ React.createElement(
+    "select",
+    {
+      value: filterNat,
+      onChange: (e) => setFilterNat(e.target.value),
+      style: { padding: "8px 14px", borderRadius: 8, border: "1px solid #e5e7eb", fontSize: 13, outline: "none", background: "#fff", cursor: "pointer" }
+    },
+    nats.map((n) => /* @__PURE__ */ React.createElement("option", { key: n, value: n }, n === "ALL" ? "All Federations" : n))
+  ))), /* @__PURE__ */ React.createElement("div", { style: { background: "#fff", border: "1px solid #e5e7eb", borderRadius: 12, overflow: "hidden" } }, /* @__PURE__ */ React.createElement("div", { style: {
+    display: "grid",
+    gridTemplateColumns: "36px 36px 44px 1fr 80px 120px 90px 100px",
+    padding: "0.6rem 1.5rem",
+    borderBottom: "1px solid #e5e7eb",
+    background: "#f9fafb",
+    alignItems: "center"
+  } }, /* @__PURE__ */ React.createElement("div", { style: { gridColumn: "1 / 3", fontSize: 11, fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: 0.5 } }, "Rank"), ["", "Name", "Fed.", "Points", "Played", "2026 W-L"].map((h) => /* @__PURE__ */ React.createElement("div", { key: h, style: { fontSize: 11, fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: 0.5 } }, h))), filtered.map((p, i) => {
+    const st = PLAYER_STATS[p.name];
+    const hasData = st && st.wins + st.losses > 0;
+    const tournsPlayed = st ? Object.keys(st.tournamentPoints).length : 0;
+    return /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        key: p.rank,
+        onClick: () => onOpenProfile(p.name),
+        style: {
+          display: "grid",
+          gridTemplateColumns: "36px 36px 44px 1fr 80px 120px 90px 100px",
+          padding: "0.8rem 1.5rem",
+          borderBottom: i < filtered.length - 1 ? "1px solid #f3f4f6" : "none",
+          alignItems: "center",
+          cursor: "pointer"
+        },
+        onMouseEnter: (e) => e.currentTarget.style.background = "#f9fafb",
+        onMouseLeave: (e) => e.currentTarget.style.background = "transparent"
+      },
+      /* @__PURE__ */ React.createElement("div", { style: {
+        fontWeight: 800,
+        fontSize: 15,
+        color: "#374151"
+      } }, p.rank),
+      /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, fontWeight: 700 } }, p.shift > 0 ? /* @__PURE__ */ React.createElement("span", { style: { color: "#16a34a" } }, "\u25B2", p.shift) : p.shift < 0 ? /* @__PURE__ */ React.createElement("span", { style: { color: "#dc2626" } }, "\u25BC", Math.abs(p.shift)) : /* @__PURE__ */ React.createElement("span", { style: { color: "#9ca3af" } }, "\u2014")),
+      /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(PlayerAvatar, { name: p.name, nat: p.nat, size: 32 })),
+      /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 600, fontSize: 15, color: "#111" } }, p.name),
+      /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: "#9ca3af", fontWeight: 600 } }, p.nat),
+      /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 700, fontSize: 15, color: "#111" } }, p.points.toLocaleString()),
+      /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: "#374151", fontWeight: 600 } }, isCurrent && !p.played && tournsPlayed > 0 ? tournsPlayed : p.played > 0 ? p.played : /* @__PURE__ */ React.createElement("span", { style: { color: "#d1d5db" } }, "\u2014")),
+      /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13 } }, p.wl ? /* @__PURE__ */ React.createElement("span", null, /* @__PURE__ */ React.createElement("span", { style: { color: "#16a34a", fontWeight: 700 } }, p.wl[0], "W"), /* @__PURE__ */ React.createElement("span", { style: { color: "#d1d5db", margin: "0 3px" } }, "-"), /* @__PURE__ */ React.createElement("span", { style: { color: "#dc2626", fontWeight: 700 } }, p.wl[1], "L")) : isCurrent && hasData ? /* @__PURE__ */ React.createElement("span", null, /* @__PURE__ */ React.createElement("span", { style: { color: "#16a34a", fontWeight: 700 } }, st.wins, "W"), /* @__PURE__ */ React.createElement("span", { style: { color: "#d1d5db", margin: "0 3px" } }, "-"), /* @__PURE__ */ React.createElement("span", { style: { color: "#dc2626", fontWeight: 700 } }, st.losses, "L")) : /* @__PURE__ */ React.createElement("span", { style: { color: "#d1d5db" } }, "\u2014"))
+    );
+  })));
+}
+function PlayersView({ onOpenProfile }) {
+  const [p1, setP1] = useState("");
+  const [p2, setP2] = useState("");
+  const player1 = PLAYERS.find((p) => p.name === p1) || null;
+  const player2 = PLAYERS.find((p) => p.name === p2) || null;
+  const st1 = p1 ? PLAYER_STATS[p1] || { wins: 0, losses: 0, matches: [] } : null;
+  const st2 = p2 ? PLAYER_STATS[p2] || { wins: 0, losses: 0, matches: [] } : null;
+  const h2hMatches = useMemo(() => {
+    if (!p1 || !p2 || !st1) return [];
+    return st1.matches.filter((m) => m.opponent === p2);
+  }, [p1, p2, st1]);
+  const h2hP1 = h2hMatches.filter((m) => m.result === "W").length;
+  const h2hP2 = h2hMatches.filter((m) => m.result === "L").length;
+  const total1 = st1 ? st1.wins + st1.losses : 0;
+  const total2 = st2 ? st2.wins + st2.losses : 0;
+  const winPct1 = total1 > 0 ? Math.round(st1.wins / total1 * 100) : null;
+  const winPct2 = total2 > 0 ? Math.round(st2.wins / total2 * 100) : null;
+  const sortedPlayers = [...PLAYERS].sort((a, b) => a.name.localeCompare(b.name));
+  const StatRow = ({ label, v1, v2, higherIsBetter = true }) => {
+    const n1 = parseFloat(v1), n2 = parseFloat(v2);
+    const hasTwo = p1 && p2 && v1 != null && v2 != null;
+    const p1Wins = hasTwo && n1 > n2 ? higherIsBetter : hasTwo && n1 < n2 ? !higherIsBetter : false;
+    const p2Wins = hasTwo && n2 > n1 ? higherIsBetter : hasTwo && n2 < n1 ? !higherIsBetter : false;
+    return /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 120px 1fr", alignItems: "center", padding: "12px 0", borderBottom: "1px solid #f3f4f6" } }, /* @__PURE__ */ React.createElement("div", { style: { textAlign: "right", fontSize: 17, fontWeight: 800, color: p1Wins ? "#111" : "#9ca3af" } }, v1 != null ? v1 : "\u2014"), /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", fontSize: 11, fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: 0.5 } }, label), /* @__PURE__ */ React.createElement("div", { style: { textAlign: "left", fontSize: 17, fontWeight: 800, color: p2Wins ? "#111" : "#9ca3af" } }, v2 != null ? v2 : "\u2014"));
+  };
+  return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("style", null, `
+        .player-sel { width:100%; padding:10px 14px; border-radius:10px; border:1px solid #e5e7eb; font-size:15px; font-weight:600; font-family:inherit; background:#fff; color:#111; outline:none; cursor:pointer; appearance:none; background-image:url(""); background-repeat:no-repeat; background-position:right 12px center; padding-right:32px; }
+        .player-sel:focus { border-color:#2563eb; }
+        .clear-sel { background:none; border:none; color:#9ca3af; cursor:pointer; font-size:18px; padding:0; line-height:1; }
+        .clear-sel:hover { color:#374151; }
+      `), /* @__PURE__ */ React.createElement("h2", { style: { margin: "0 0 24px", fontSize: 22, fontWeight: 800, color: "#111" } }, "Player Comparison"), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 60px 1fr", gap: 0, alignItems: "center", marginBottom: 32 } }, /* @__PURE__ */ React.createElement("div", { style: { background: "#fff", border: "1px solid #e5e7eb", borderRadius: 12, padding: 16 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 8 } }, "Player 1"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 } }, /* @__PURE__ */ React.createElement("select", { className: "player-sel", value: p1, onChange: (e) => setP1(e.target.value) }, /* @__PURE__ */ React.createElement("option", { value: "" }, "Select a player..."), sortedPlayers.filter((p) => p.name !== p2).map((p) => /* @__PURE__ */ React.createElement("option", { key: p.name, value: p.name }, "#", p.rank, " ", p.name, " (", p.nat, ")"))), p1 && /* @__PURE__ */ React.createElement("button", { className: "clear-sel", onClick: () => setP1("") }, "\xD7")), player1 && /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginTop: 12 } }, /* @__PURE__ */ React.createElement(PlayerAvatar, { name: player1.name, nat: player1.nat, size: 40 }), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 800, fontSize: 16, color: "#111" } }, player1.name), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: "#9ca3af" } }, player1.nat, " \xB7 ", NAT_FULL[player1.nat])))), /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", fontSize: 15, fontWeight: 800, color: "#d1d5db" } }, "VS"), /* @__PURE__ */ React.createElement("div", { style: { background: "#fff", border: "1px solid #e5e7eb", borderRadius: 12, padding: 16 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 8 } }, "Player 2 ", /* @__PURE__ */ React.createElement("span", { style: { fontWeight: 400, fontSize: 10 } }, "(optional)")), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 } }, /* @__PURE__ */ React.createElement("select", { className: "player-sel", value: p2, onChange: (e) => setP2(e.target.value) }, /* @__PURE__ */ React.createElement("option", { value: "" }, "Select a player..."), sortedPlayers.filter((p) => p.name !== p1).map((p) => /* @__PURE__ */ React.createElement("option", { key: p.name, value: p.name }, "#", p.rank, " ", p.name, " (", p.nat, ")"))), p2 && /* @__PURE__ */ React.createElement("button", { className: "clear-sel", onClick: () => setP2("") }, "\xD7")), player2 && /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginTop: 12 } }, /* @__PURE__ */ React.createElement(PlayerAvatar, { name: player2.name, nat: player2.nat, size: 40 }), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 800, fontSize: 16, color: "#111" } }, player2.name), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: "#9ca3af" } }, player2.nat, " \xB7 ", NAT_FULL[player2.nat]))))), !p1 && !p2 && /* @__PURE__ */ React.createElement("div", { style: { background: "#fff", border: "1px dashed #e5e7eb", borderRadius: 12, padding: "3rem", textAlign: "center", color: "#9ca3af" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 32, marginBottom: 12 } }, "\u2694\uFE0F"), /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 600, fontSize: 15 } }, "Select one player to view their stats, or two to compare.")), (p1 || p2) && /* @__PURE__ */ React.createElement("div", { style: { background: "#fff", border: "1px solid #e5e7eb", borderRadius: 12, padding: "0 24px", marginBottom: 20 } }, p1 && p2 && h2hMatches.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { padding: "16px 0", borderBottom: "1px solid #f3f4f6", display: "grid", gridTemplateColumns: "1fr 120px 1fr", alignItems: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { textAlign: "right" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 36, fontWeight: 900, color: h2hP1 > h2hP2 ? "#111" : "#9ca3af" } }, h2hP1), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: "#9ca3af", fontWeight: 600 } }, p1)), /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: 0.5 } }, "Head to Head"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: "#d1d5db", marginTop: 2 } }, h2hMatches.length, " ", h2hMatches.length === 1 ? "match" : "matches")), /* @__PURE__ */ React.createElement("div", { style: { textAlign: "left" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 36, fontWeight: 900, color: h2hP2 > h2hP1 ? "#111" : "#9ca3af" } }, h2hP2), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: "#9ca3af", fontWeight: 600 } }, p2))), p1 && p2 && h2hMatches.length === 0 && /* @__PURE__ */ React.createElement("div", { style: { padding: "12px 0", borderBottom: "1px solid #f3f4f6", textAlign: "center", fontSize: 13, color: "#9ca3af" } }, "These two have not met in 2026."), /* @__PURE__ */ React.createElement(
+    StatRow,
+    {
+      label: "Rank",
+      v1: player1 ? `#${player1.rank}` : null,
+      v2: player2 ? `#${player2.rank}` : null,
+      higherIsBetter: false
+    }
+  ), /* @__PURE__ */ React.createElement(
+    StatRow,
+    {
+      label: "2026 Titles",
+      v1: st1 ? st1.titles : null,
+      v2: st2 ? st2.titles : null
+    }
+  ), /* @__PURE__ */ React.createElement(
+    StatRow,
+    {
+      label: "Points",
+      v1: player1 ? player1.points.toLocaleString() : null,
+      v2: player2 ? player2.points.toLocaleString() : null
+    }
+  ), /* @__PURE__ */ React.createElement(
+    StatRow,
+    {
+      label: "2026 Wins",
+      v1: st1 ? st1.wins : null,
+      v2: st2 ? st2.wins : null
+    }
+  ), /* @__PURE__ */ React.createElement(
+    StatRow,
+    {
+      label: "2026 Losses",
+      v1: st1 ? st1.losses : null,
+      v2: st2 ? st2.losses : null,
+      higherIsBetter: false
+    }
+  ), /* @__PURE__ */ React.createElement(
+    StatRow,
+    {
+      label: "Win %",
+      v1: winPct1 != null ? `${winPct1}%` : null,
+      v2: winPct2 != null ? `${winPct2}%` : null
+    }
+  ), /* @__PURE__ */ React.createElement("div", { style: { padding: "12px 0" } }), " "), p1 && p2 && h2hMatches.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { background: "#fff", border: "1px solid #e5e7eb", borderRadius: 12, overflow: "hidden" } }, /* @__PURE__ */ React.createElement("div", { style: { padding: "12px 20px", borderBottom: "1px solid #f3f4f6", background: "#f9fafb" } }, /* @__PURE__ */ React.createElement("span", { style: { fontWeight: 700, fontSize: 14, color: "#111" } }, "Head-to-Head Matches")), h2hMatches.map((m, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: {
+    padding: "12px 20px",
+    borderBottom: i < h2hMatches.length - 1 ? "1px solid #f9fafb" : "none",
+    display: "grid",
+    gridTemplateColumns: "1fr 120px 80px 60px",
+    alignItems: "center",
+    gap: 12,
+    fontSize: 14
+  } }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 600, color: "#111" } }, m.tournament), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: "#9ca3af" } }, m.round, " \xB7 ", m.dates)), /* @__PURE__ */ React.createElement(TierBadge, { tier: m.tier }), /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 700, color: "#374151" } }, m.score), /* @__PURE__ */ React.createElement("span", { style: {
+    display: "inline-block",
+    padding: "2px 10px",
+    borderRadius: 20,
+    fontSize: 12,
+    fontWeight: 700,
+    background: m.result === "W" ? "#dcfce7" : "#fee2e2",
+    color: m.result === "W" ? "#15803d" : "#dc2626",
+    border: `1px solid ${m.result === "W" ? "#bbf7d0" : "#fecaca"}`
+  } }, m.result === "W" ? "WIN" : "LOSS")))));
+}
+function MatchCard({ match, top, onOpenProfile, seeds = {} }) {
+  if (match.bye) {
+    const seed = seeds[match.bye];
+    return /* @__PURE__ */ React.createElement("div", { style: {
+      position: "absolute",
+      top,
+      left: 0,
+      width: MW,
+      background: "#fafafa",
+      border: "1px dashed #e5e7eb",
+      borderRadius: 8,
+      overflow: "hidden",
+      boxShadow: "none"
+    } }, /* @__PURE__ */ React.createElement("div", { style: {
+      padding: "6px 10px",
+      fontSize: 12,
+      display: "flex",
+      alignItems: "center",
+      gap: 4,
+      color: "#9ca3af",
+      fontStyle: "italic",
+      height: MH
+    } }, seed && /* @__PURE__ */ React.createElement("span", { style: { fontSize: 10, fontWeight: 700, opacity: 0.6, flexShrink: 0 } }, seed), /* @__PURE__ */ React.createElement("span", { style: { fontWeight: 500 } }, match.bye, " ", /* @__PURE__ */ React.createElement("span", { style: { fontSize: 10 } }, "(bye)"))));
+  }
+  const rows = [
+    { name: match.p1, score: match.s1, win: match.w === match.p1 },
+    { name: match.p2, score: match.s2, win: match.w === match.p2 }
+  ];
+  return /* @__PURE__ */ React.createElement("div", { style: {
+    position: "absolute",
+    top,
+    left: 0,
+    width: MW,
+    background: "#fff",
+    border: "1px solid #e5e7eb",
+    borderRadius: 8,
+    overflow: "hidden",
+    boxShadow: "0 1px 3px rgba(0,0,0,0.06)"
+  } }, rows.map((r, i) => {
+    const seed = seeds[r.name];
+    return /* @__PURE__ */ React.createElement("div", { key: i, style: {
+      padding: "6px 10px",
+      fontSize: 12,
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      background: r.win ? "#f0fdf4" : "transparent",
+      borderBottom: i === 0 ? "1px solid #f3f4f6" : "none",
+      color: r.win ? "#15803d" : match.w ? "#9ca3af" : "#111"
+    } }, /* @__PURE__ */ React.createElement("span", { style: {
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
+      maxWidth: 148,
+      fontWeight: r.win ? 700 : 500,
+      display: "flex",
+      alignItems: "center",
+      gap: 4
+    } }, /* @__PURE__ */ React.createElement("span", { style: {
+      fontSize: 10,
+      fontWeight: 700,
+      minWidth: 14,
+      flexShrink: 0,
+      textAlign: "right",
+      color: r.win ? "#15803d" : "#9ca3af",
+      opacity: 0.7
+    } }, seed || ""), /* @__PURE__ */ React.createElement(
+      PlayerLink,
+      {
+        name: r.name,
+        onOpen: onOpenProfile,
+        style: { color: r.win ? "#15803d" : match.w ? "#9ca3af" : "#2563eb", fontWeight: r.win ? 700 : 500 }
+      }
+    )), r.score !== null && /* @__PURE__ */ React.createElement("span", { style: { fontWeight: 700, fontSize: 12, color: r.win ? "#15803d" : "#9ca3af", marginLeft: 6, flexShrink: 0 } }, r.score));
+  }));
+}
+function BracketView({ tournament, onOpenProfile, onBack }) {
+  const data = BRACKET_DATA[tournament.id];
+  const size = data?.drawSize || TIERS[tournament.tier]?.draws || 16;
+  const numRounds = data?.rounds.length || 0;
+  const slotUnit = MH + 14;
+  const totalH = size * slotUnit;
+  const getRoundPos = (ri, rounds) => Array.from({ length: rounds[ri].length }, (_, i) => {
+    const n = Math.pow(2, ri);
+    const first = i * n;
+    const last = first + n - 1;
+    return (first * slotUnit + MH / 2 + (last * slotUnit + MH / 2)) / 2 - MH / 2;
+  });
+  const normalizedRounds = useMemo(() => {
+    if (!data) return [];
+    return data.rounds.map((round, ri) => {
+      if (ri === 0) return round;
+      const prevRound = data.rounds[ri - 1];
+      return round.map((match, mi) => {
+        const topFeeder = prevRound[mi * 2];
+        const botFeeder = prevRound[mi * 2 + 1];
+        const topWinner = topFeeder?.w;
+        const botWinner = botFeeder?.w;
+        if (!topWinner || !botWinner) return match;
+        if (match.p1 === botWinner && match.p2 === topWinner) {
+          return { ...match, p1: match.p2, p2: match.p1, s1: match.s2, s2: match.s1 };
+        }
+        return match;
+      });
+    });
+  }, [data]);
+  const roundLabel = (ri, total) => {
+    if (ri === total - 1) return "Final";
+    if (ri === total - 2) return "Semifinals";
+    const roundNum = ri + 1;
+    return `Round ${roundNum}`;
+  };
+  return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: {
+    background: "none",
+    border: "1px solid #e5e7eb",
+    borderRadius: 8,
+    padding: "6px 14px",
+    cursor: "pointer",
+    fontSize: 13,
+    color: "#6b7280",
+    marginBottom: 20,
+    display: "flex",
+    alignItems: "center",
+    gap: 6
+  } }, "\u2190 All Tournaments"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 16, marginBottom: 20, flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h2", { style: { margin: 0, fontSize: 22, fontWeight: 800, color: "#111" } }, tournament.name), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: "#9ca3af", marginTop: 2 } }, tournament.location, " \xB7 ", tournament.start, " \u2013 ", tournament.end)), /* @__PURE__ */ React.createElement(TierBadge, { tier: tournament.tier }), data?.champion && /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 8, padding: "6px 14px", marginLeft: "auto" } }, /* @__PURE__ */ React.createElement("span", null, "\u{1F3C6}"), /* @__PURE__ */ React.createElement("span", { style: { fontWeight: 700, fontSize: 14, color: "#92400e" } }, "Champion:"), /* @__PURE__ */ React.createElement(PlayerAvatar, { name: data.champion, nat: "", size: 24 }), /* @__PURE__ */ React.createElement("span", { style: { fontWeight: 700, fontSize: 14, color: "#92400e" } }, data.champion))), !data ? /* @__PURE__ */ React.createElement("div", { style: { background: "#fff", border: "1px dashed #e5e7eb", borderRadius: 12, padding: "3rem", textAlign: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 32, marginBottom: 12 } }, "\u{1F5C2}\uFE0F"), /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 600, color: "#6b7280", fontSize: 15 } }, tournament.status === "live" ? "Bracket coming soon" : "Bracket not yet entered")) : /* @__PURE__ */ React.createElement("div", { style: { overflowX: "auto", paddingBottom: 16 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "flex-start" } }, normalizedRounds.map((round, ri) => {
+    const positions = getRoundPos(ri, normalizedRounds);
+    const colW = MW + CGAP;
+    return /* @__PURE__ */ React.createElement("div", { key: ri, style: { display: "flex", flexDirection: "column", width: colW, flexShrink: 0 } }, /* @__PURE__ */ React.createElement("div", { style: {
+      textAlign: "center",
+      padding: "4px 0",
+      fontSize: 11,
+      fontWeight: 700,
+      color: "#9ca3af",
+      textTransform: "uppercase",
+      letterSpacing: 0.5,
+      borderBottom: "1px solid #e5e7eb",
+      marginRight: CGAP,
+      marginBottom: 0
+    } }, roundLabel(ri, numRounds)), /* @__PURE__ */ React.createElement("div", { style: { position: "relative", height: totalH, marginRight: CGAP } }, round.map((match, mi) => /* @__PURE__ */ React.createElement(MatchCard, { key: mi, match, top: positions[mi], onOpenProfile, seeds: data.seeds || {} })), ri < numRounds - 1 && /* @__PURE__ */ React.createElement("svg", { style: { position: "absolute", top: 0, left: MW, pointerEvents: "none" }, width: CGAP, height: totalH }, round.map((_, mi) => {
+      const myC = positions[mi] + MH / 2;
+      const nextP = getRoundPos(ri + 1, normalizedRounds);
+      const parC = nextP[Math.floor(mi / 2)] + MH / 2;
+      const midX = CGAP / 2;
+      return /* @__PURE__ */ React.createElement("g", { key: mi }, /* @__PURE__ */ React.createElement("line", { x1: 0, y1: myC, x2: midX, y2: myC, stroke: "#e5e7eb", strokeWidth: 1.5 }), mi % 2 === 1 && /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("line", { x1: midX, y1: positions[mi - 1] + MH / 2, x2: midX, y2: myC, stroke: "#e5e7eb", strokeWidth: 1.5 }), /* @__PURE__ */ React.createElement("line", { x1: midX, y1: parC, x2: CGAP, y2: parC, stroke: "#e5e7eb", strokeWidth: 1.5 })));
+    }))));
+  }))));
+}
+function PlayerProfile({ playerName, onBack, onOpenProfile, onOpenTournament }) {
+  const player = PLAYERS.find((p) => p.name === playerName);
+  const st = PLAYER_STATS[playerName] || { wins: 0, losses: 0, matches: [] };
+  if (!player) return null;
+  const total = st.wins + st.losses;
+  const winPct = total > 0 ? Math.round(st.wins / total * 100) : 0;
+  const titles = st.titles || 0;
+  const ROUND_ORDER = ["Round 1", "Round 2", "Round 3", "Semifinals", "Final"];
+  const byTournament = {};
+  st.matches.forEach((m) => {
+    if (!byTournament[m.tournamentId]) {
+      const tData = TOURNAMENTS.find((t) => t.id === m.tournamentId);
+      byTournament[m.tournamentId] = { tournamentId: m.tournamentId, name: m.tournament, tier: m.tier, dates: m.dates, location: tData?.location || "", matches: [] };
+    }
+    byTournament[m.tournamentId].matches.push(m);
+  });
+  const entries = Object.values(byTournament).sort((a, b) => Number(b.tournamentId) - Number(a.tournamentId));
+  return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: {
+    background: "none",
+    border: "1px solid #e5e7eb",
+    borderRadius: 8,
+    padding: "6px 14px",
+    cursor: "pointer",
+    fontSize: 13,
+    color: "#6b7280",
+    marginBottom: 20,
+    display: "flex",
+    alignItems: "center",
+    gap: 6
+  } }, "\u2190 Back"), /* @__PURE__ */ React.createElement("div", { style: { background: "#fff", border: "1px solid #e5e7eb", borderRadius: 16, padding: "1.75rem 2rem", marginBottom: 20, display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement(PlayerAvatar, { name: player.name, nat: player.nat, size: 96 }), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("h1", { style: { margin: 0, fontSize: 32, fontWeight: 900, color: "#111" } }, player.name), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: "#9ca3af", marginTop: 4 } }, player.nat, " \xB7 ", NAT_FULL[player.nat]), titles > 0 && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 8, fontSize: 14, color: "#92400e", fontWeight: 700 } }, "\u{1F3C6} ".repeat(titles), titles === 1 ? "1 Title" : `${titles} Titles`, " in 2026")), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 20, flexWrap: "wrap" } }, [
+    { label: "Rank", value: `#${player.rank}`, color: "#111" },
+    ...st.titles > 0 ? [
+      { label: "Titles", value: `\u{1F3C6} ${st.titles}`, color: "#92400e" }
+    ] : [],
+    { label: "Points", value: player.points.toLocaleString(), color: "#111" },
+    ...total > 0 ? [
+      { label: "2026 W-L", value: `${st.wins}-${st.losses}`, color: "#111" },
+      { label: "Win %", value: `${winPct}%`, color: "#111" }
+    ] : []
+  ].map((s) => /* @__PURE__ */ React.createElement("div", { key: s.label, style: { textAlign: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4 } }, s.label), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 28, fontWeight: 900, color: s.color, lineHeight: 1 } }, s.value))))), total > 0 ? /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h3", { style: { margin: "0 0 16px", fontSize: 18, fontWeight: 800, color: "#111" } }, "2026 Match Results"), entries.map((te) => /* @__PURE__ */ React.createElement("div", { key: te.tournamentId, style: { background: "#fff", border: "1px solid #e5e7eb", borderRadius: 12, overflow: "hidden", marginBottom: 12 } }, /* @__PURE__ */ React.createElement("div", { style: {
+    padding: "0.75rem 1.25rem",
+    borderBottom: "1px solid #f3f4f6",
+    background: "#f3f0ff",
+    display: "flex",
+    alignItems: "center",
+    gap: 12
+  } }, /* @__PURE__ */ React.createElement(
+    "span",
+    {
+      onClick: () => onOpenTournament && onOpenTournament(te.tournamentId),
+      style: { fontWeight: 700, fontSize: 15, color: "#111", cursor: "pointer", textDecoration: "underline", textDecorationStyle: "dotted", textDecorationColor: "#9ca3af" }
+    },
+    te.name
+  ), te.location && /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: "#9ca3af", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.3, marginTop: 1 } }, te.location), /* @__PURE__ */ React.createElement(TierBadge, { tier: te.tier }), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 12, color: "#7c3aed", marginLeft: "auto" } }, te.dates)), te.matches.slice().sort((a, b) => ROUND_ORDER.indexOf(b.round) - ROUND_ORDER.indexOf(a.round)).map((m, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: {
+    padding: "0.7rem 1.25rem",
+    borderBottom: "1px solid #f9fafb",
+    display: "grid",
+    gridTemplateColumns: "140px 1fr 80px 60px",
+    alignItems: "center",
+    gap: 12,
+    fontSize: 14
+  } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: "#6b7280" } }, m.round), /* @__PURE__ */ React.createElement("div", null, "vs ", /* @__PURE__ */ React.createElement(PlayerLink, { name: m.opponent, onOpen: onOpenProfile, style: { color: "#2563eb", fontWeight: 600 } })), /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 700, color: "#374151" } }, m.score), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("span", { style: {
+    display: "inline-block",
+    padding: "2px 10px",
+    borderRadius: 20,
+    fontSize: 12,
+    fontWeight: 700,
+    background: m.result === "W" ? "#dcfce7" : "#fee2e2",
+    color: m.result === "W" ? "#15803d" : "#dc2626",
+    border: `1px solid ${m.result === "W" ? "#bbf7d0" : "#fecaca"}`
+  } }, m.result === "W" ? "WIN" : "LOSS")))), st.tournamentPoints[te.tournamentId] > 0 && /* @__PURE__ */ React.createElement("div", { style: {
+    padding: "0.6rem 1.25rem",
+    background: "#f9fafb",
+    borderTop: "1px solid #e5e7eb",
+    display: "flex",
+    alignItems: "center",
+    gap: 6
+  } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 12, color: "#6b7280", fontWeight: 600 } }, "Ranking Points Earned:"), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 13, fontWeight: 800, color: "#374151" } }, "+", st.tournamentPoints[te.tournamentId]))))) : /* @__PURE__ */ React.createElement("div", { style: { background: "#fff", border: "1px dashed #e5e7eb", borderRadius: 12, padding: "2.5rem", textAlign: "center", color: "#9ca3af", fontSize: 14 } }, "No 2026 match results recorded yet."));
+}
+const ARCHIVE = {
+  2025: {
+    yearEndRankings: [
+      { rank: 1, name: "Jessica", nat: "USA", points: 9050, shift: 0, wl: [1, 1], played: 1 },
+      { rank: 2, name: "Athena", nat: "USA", points: 8730, shift: -1, wl: [1, 1], played: 1 },
+      { rank: 3, name: "Nate", nat: "USA", points: 7330, shift: -3, wl: [1, 1], played: 1 },
+      { rank: 4, name: "Jacob", nat: "USA", points: 6780, shift: 0, wl: [2, 1], played: 1 },
+      { rank: 5, name: "Raymond", nat: "USA", points: 5710, shift: 1, wl: [0, 1], played: 1 },
+      { rank: 6, name: "Ellison", nat: "USA", points: 5200, shift: 2, wl: [0, 1], played: 1 },
+      { rank: 7, name: "Carlos", nat: "USA", points: 5030, shift: 0, wl: [0, 1], played: 1 },
+      { rank: 8, name: "Andrew", nat: "KAZ", points: 4800, shift: 1, wl: [0, 1], played: 1 },
+      { rank: 9, name: "Jeon JUNG-KOOK", nat: "KOR", points: 950, shift: -3 },
+      { rank: 10, name: "JonBen\xE9t Ramsey", nat: "USA", points: 400, shift: -3 },
+      { rank: 11, name: "Abraham Lincoln", nat: "USA", points: 200, shift: -1 },
+      { rank: 12, name: "Benson Boone", nat: "USA", points: 200, shift: -1 },
+      { rank: 13, name: "Doomfist", nat: "NGR", points: 200, shift: -1 },
+      { rank: 14, name: "Hatsune Miku", nat: "JPN", points: 200, shift: -3 },
+      { rank: 15, name: "Jigglypuff", nat: "PKM", points: 200, shift: -1 },
+      { rank: 16, name: "Ludwig Ahgren", nat: "USA", points: 200, shift: -1 },
+      { rank: 17, name: "Satoru Gojo", nat: "JPN", points: 200, shift: -2, wl: [0, 1], played: 1 },
+      { rank: 18, name: "Tate McRae", nat: "CAN", points: 200, shift: 6, wl: [0, 1], played: 1 },
+      { rank: 19, name: "Taylor Swift", nat: "USA", points: 200, shift: -1 },
+      { rank: 20, name: "Barack Obama", nat: "USA", points: 100, shift: 0 },
+      { rank: 21, name: "Darth Vader", nat: "EMP", points: 100, shift: -1 },
+      { rank: 22, name: "Dean Withers", nat: "AUS", points: 100, shift: 3 },
+      { rank: 23, name: "Deborah Sater", nat: "RUS", points: 100, shift: 0 },
+      { rank: 24, name: "Denji", nat: "JPN", points: 100, shift: 1 },
+      { rank: 25, name: "Feraligatr", nat: "PKM", points: 100, shift: 3, wl: [1, 1], played: 1 },
+      { rank: 26, name: "Herobrine", nat: "MCF", points: 100, shift: 9, wl: [0, 1], played: 1 },
+      { rank: 27, name: "Katniss Everdeen", nat: "PAN", points: 100, shift: 3 },
+      { rank: 28, name: "Kento Nanami", nat: "JPN", points: 100, shift: 0 },
+      { rank: 29, name: "Luigi", nat: "ITA", points: 100, shift: -4 },
+      { rank: 30, name: "Mario", nat: "ITA", points: 100, shift: 2, wl: [4, 0], played: 1 },
+      { rank: 31, name: "Minecraft Villager", nat: "MCF", points: 100, shift: -3 },
+      { rank: 32, name: "Roronoa Zoro", nat: "JPN", points: 100, shift: -4, wl: [3, 1], played: 1 },
+      { rank: 33, name: "Titus", nat: "CAN", points: 100, shift: -3 },
+      { rank: 34, name: "Xitong Wei", nat: "CHN", points: 100, shift: -1 },
+      { rank: 35, name: "Jacob Elordi", nat: "AUS", points: 50, shift: 0 },
+      { rank: 36, name: "Jonathan Bailey", nat: "GBR", points: 50, shift: 1 },
+      { rank: 37, name: "Peter Griffin", nat: "USA", points: 50, shift: 0 },
+      { rank: 38, name: "Zohran Mamdani", nat: "USA", points: 50, shift: 9 }
+    ],
+    champions: [
+      { name: "Kiwi Cup", tier: "500", location: "Auckland, NZL", champion: "Ellison" },
+      { name: "Australian Super Smackdown (ASS) Open", tier: "MAJOR", location: "Melbourne, AUS", champion: "Athena" },
+      { name: "Dunes Invitational", tier: "500", location: "Dubai, UAE", champion: "Jessica" },
+      { name: "Kabul Open", tier: "500", location: "Kabul, AFG", champion: null },
+      { name: "Seoul Masters", tier: "1000", location: "Seoul, KOR", champion: "Nate" },
+      { name: "Dragon's Cup", tier: "500", location: "Beijing, CHN", champion: "Nate" },
+      { name: "Tea Invitational Throwdown (TIT) Open", tier: "MAJOR", location: "Tokyo, JPN", champion: "Nate" },
+      { name: "Royal London Cup", tier: "1000", location: "London, GBR", champion: "Andrew" },
+      { name: "Paris Grand Prix", tier: "500", location: "Paris, FRA", champion: "Ellison" },
+      { name: "Berlin Masters", tier: "1000", location: "Berlin, GER", champion: "Carlos" },
+      { name: "Arctic Open", tier: "500", location: "Reykjav\xEDk, ISL", champion: null },
+      { name: "The Championships, Ultimate Mayhem (CUM)", tier: "MAJOR", location: "Athens, GRE", champion: "Jessica" },
+      { name: "Southern Summit Open", tier: "500", location: "Cape Town, RSA", champion: "Athena" },
+      { name: "Nile Crown", tier: "1000", location: "Cairo, EGY", champion: "Raymond" },
+      { name: "Cascadia Cup", tier: "500", location: "Iguazu Falls, ARG", champion: "Jacob" },
+      { name: "Amazon Battlegrounds", tier: "1000", location: "S\xE3o Paulo, BRA", champion: null },
+      { name: "Pacific Sun Open", tier: "1000", location: "Acapulco, MEX", champion: "Jacob" },
+      { name: "Spanktown United States (SUS) Open", tier: "MAJOR", location: "New York, USA", champion: "Jessica" },
+      { name: "Iron Horse Cup", tier: "500", location: "San Ramon, USA", champion: null, cancelled: true },
+      { name: "Apex Invitational", tier: "Finals", location: "Low-Earth Orbit", champion: null, cancelled: true }
+    ]
+  }
+};
+function ArchiveView({ onOpenProfile }) {
+  const [year, setYear] = useState(2025);
+  const data = ARCHIVE[year];
+  return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 } }, /* @__PURE__ */ React.createElement("h2", { style: { margin: 0, fontSize: 22, fontWeight: 800, color: "#111" } }, "Archive"), /* @__PURE__ */ React.createElement(
+    "select",
+    {
+      value: year,
+      onChange: (e) => setYear(Number(e.target.value)),
+      style: { padding: "8px 16px", borderRadius: 8, border: "1px solid #e5e7eb", fontSize: 14, fontWeight: 700, outline: "none", background: "#fff", cursor: "pointer", color: "#111" }
+    },
+    /* @__PURE__ */ React.createElement("option", { value: 2025 }, "2025 Season")
+  )), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "3fr 2fr", gap: 28, alignItems: "start" } }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h3", { style: { margin: "0 0 14px", fontSize: 16, fontWeight: 800, color: "#111", letterSpacing: -0.3 } }, year, " Tournament Champions"), /* @__PURE__ */ React.createElement("div", { style: { background: "#fff", border: "1px solid #e5e7eb", borderRadius: 12, overflow: "hidden" } }, data.champions.map((t, i) => /* @__PURE__ */ React.createElement("div", { key: t.name, style: {
+    padding: "0.7rem 1.1rem",
+    borderBottom: i < data.champions.length - 1 ? "1px solid #f3f4f6" : "none",
+    display: "grid",
+    gridTemplateColumns: "1fr 100px 180px",
+    alignItems: "center",
+    gap: 10
+  } }, /* @__PURE__ */ React.createElement("div", { style: { minWidth: 0 } }, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 600, fontSize: 13, color: "#111", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, t.name), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: "#9ca3af", marginTop: 1 } }, t.location)), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(TierBadge, { tier: t.tier })), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 5 } }, t.champion ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("span", { style: { fontWeight: 600, fontSize: 12, color: "#6b7280", whiteSpace: "nowrap" } }, "Champion:"), /* @__PURE__ */ React.createElement(PlayerAvatar, { name: t.champion, nat: "", size: 22 }), /* @__PURE__ */ React.createElement(
+    "span",
+    {
+      onClick: () => onOpenProfile(t.champion),
+      style: { fontWeight: 700, fontSize: 13, color: "#111", cursor: "pointer", textDecoration: "underline", textDecorationStyle: "dotted", textDecorationColor: "#9ca3af" }
+    },
+    t.champion
+  )) : /* @__PURE__ */ React.createElement("span", { style: { fontSize: 12, color: "#d1d5db" } }, t.cancelled ? "Cancelled" : "Not held")))))), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h3", { style: { margin: "0 0 14px", fontSize: 16, fontWeight: 800, color: "#111", letterSpacing: -0.3 } }, year, " Year-End Rankings"), /* @__PURE__ */ React.createElement("div", { style: { background: "#fff", border: "1px solid #e5e7eb", borderRadius: 12, overflow: "hidden" } }, /* @__PURE__ */ React.createElement("div", { style: {
+    display: "grid",
+    gridTemplateColumns: "40px 36px 1fr 80px",
+    padding: "0.5rem 1rem",
+    borderBottom: "1px solid #e5e7eb",
+    background: "#f9fafb"
+  } }, ["#", "", "Player", "Points"].map((h) => /* @__PURE__ */ React.createElement("div", { key: h, style: { fontSize: 11, fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: 0.5 } }, h))), data.yearEndRankings.map((p, i) => /* @__PURE__ */ React.createElement("div", { key: p.name, style: {
+    display: "grid",
+    gridTemplateColumns: "40px 36px 1fr 80px",
+    padding: "0.55rem 1rem",
+    borderBottom: i < data.yearEndRankings.length - 1 ? "1px solid #f9fafb" : "none",
+    alignItems: "center"
+  } }, /* @__PURE__ */ React.createElement("div", { style: {
+    fontWeight: 800,
+    fontSize: 13,
+    color: "#374151"
+  } }, p.rank), /* @__PURE__ */ React.createElement(PlayerAvatar, { name: p.name, nat: p.nat, size: 26 }), /* @__PURE__ */ React.createElement(
+    "div",
+    {
+      onClick: () => onOpenProfile(p.name),
+      style: {
+        fontWeight: 600,
+        fontSize: 13,
+        color: "#111",
+        cursor: "pointer",
+        textDecoration: "underline",
+        textDecorationStyle: "dotted",
+        textDecorationColor: "#9ca3af"
+      }
+    },
+    p.name
+  ), /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 700, fontSize: 13, color: "#374151" } }, p.points.toLocaleString())))))));
+}
+function App() {
+  const [tab, setTab] = useState("live");
+  const [selectedTournament, setSelectedTournament] = useState(null);
+  const [profilePlayer, setProfilePlayer] = useState(null);
+  const openProfile = (name) => {
+    setProfilePlayer(name);
+  };
+  const closeProfile = () => {
+    setProfilePlayer(null);
+  };
+  const handleSelectTournament = (t) => {
+    setSelectedTournament(t);
+    setTab("tournaments");
+  };
+  const TABS = [
+    { id: "live", label: "Live" },
+    { id: "tournaments", label: "Tournaments" },
+    { id: "rankings", label: "Player Rankings" },
+    { id: "players", label: "Head-to-Head" },
+    { id: "archive", label: "Archive" }
+  ];
+  return /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Inter','Helvetica Neue',Arial,sans-serif", background: "#f9fafb", minHeight: "100vh", color: "#111" } }, /* @__PURE__ */ React.createElement("style", null, `
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        * { box-sizing: border-box; }
+        body { margin: 0; background: #f9fafb; }
+        @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(0.9)} }
+        input:focus { outline: none; border-color: #2563eb !important; }
+        select:focus { outline: none; }
+        button:focus { outline: none; }
+      `), /* @__PURE__ */ React.createElement("div", { style: { background: "#fff", borderBottom: "1px solid #e5e7eb", position: "sticky", top: 0, zIndex: 100 } }, /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 1160, margin: "0 auto", padding: "0 24px", display: "flex", alignItems: "center", height: 60 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 12, marginRight: 40 } }, /* @__PURE__ */ React.createElement("img", { src: "", alt: "DUDB World Tour", style: { height: 48, width: "auto" } }), /* @__PURE__ */ React.createElement("div", { style: { lineHeight: 1.2 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#111", letterSpacing: "-0.3px" } }, "Dumbass United"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#111", letterSpacing: "-0.3px" } }, "DeathBattle"))), /* @__PURE__ */ React.createElement("nav", { style: { display: "flex", gap: 4 } }, TABS.map(({ id, label }) => /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      key: id,
+      onClick: () => {
+        setProfilePlayer(null);
+        setSelectedTournament(null);
+        setTab(id);
+      },
+      style: {
+        padding: "6px 16px",
+        borderRadius: 8,
+        border: "none",
+        cursor: "pointer",
+        fontSize: 14,
+        fontWeight: 600,
+        background: tab === id && !profilePlayer ? "#111" : "transparent",
+        color: tab === id && !profilePlayer ? "#fff" : "#6b7280",
+        transition: "all 0.15s"
+      }
+    },
+    label
+  ))))), /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 1160, margin: "0 auto", padding: "32px 24px" } }, profilePlayer ? /* @__PURE__ */ React.createElement(PlayerProfile, { playerName: profilePlayer, onBack: closeProfile, onOpenProfile: openProfile, onOpenTournament: (tid) => {
+    closeProfile();
+    setSelectedTournament(TOURNAMENTS.find((t) => t.id === tid));
+    setTab("tournaments");
+  } }) : /* @__PURE__ */ React.createElement(React.Fragment, null, tab === "live" && /* @__PURE__ */ React.createElement(LiveView, { tournaments: TOURNAMENTS, onSelectTournament: handleSelectTournament, onOpenProfile: openProfile }), tab === "tournaments" && (selectedTournament ? /* @__PURE__ */ React.createElement(BracketView, { tournament: selectedTournament, onOpenProfile: openProfile, onBack: () => setSelectedTournament(null) }) : /* @__PURE__ */ React.createElement(TournamentsView, { tournaments: TOURNAMENTS, onSelectTournament: handleSelectTournament })), tab === "rankings" && /* @__PURE__ */ React.createElement(RankingsView, { onOpenProfile: openProfile }), tab === "players" && /* @__PURE__ */ React.createElement(PlayersView, { onOpenProfile: openProfile }), tab === "archive" && /* @__PURE__ */ React.createElement(ArchiveView, { onOpenProfile: openProfile }))));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));</script></body></html>
